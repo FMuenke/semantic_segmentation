@@ -1,4 +1,4 @@
-from convolutional_neural_network.resnet import ResNet
+from resnet import ResNet
 
 
 class BackboneHandler:
