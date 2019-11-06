@@ -51,4 +51,5 @@ class LbmTag:
                                 and lbm[y, x, 1] == self.color_coding[cls][0][1] \
                                 and lbm[y, x, 2] == self.color_coding[cls][0][0]:
                             y_img[y, x, idx] = 1
-        return y_img
+
+        return cv2.resize(y_img, (300, 300), interpolation=cv2.INTER_NEAREST)

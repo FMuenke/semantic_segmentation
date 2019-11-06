@@ -4,7 +4,7 @@ from convolutional_neural_network.model_handler import ModelHandler
 
 from data_structure.data_set import DataSet
 
-from options.config import Config, save_config, load_config
+from options.config import Config, save_config
 
 
 def main(args_):
@@ -14,12 +14,13 @@ def main(args_):
     cfg = Config()
 
     model_handler = ModelHandler(mf, cfg)
-    model_h = model_handler.create_model()
+    model_h = model_handler.build()
 
     save_config(model_dir=mf, cfg=cfg)
 
-    d_set = DataSet(df)
-    train_set, validation_set = d_set.split()
+    d_set = DataSet(df, cfg.color_coding)
+    tag_set = d_set.load()
+    train_set, validation_set = d_set.split(tag_set)
 
     model_h.fit(train_set, validation_set)
 

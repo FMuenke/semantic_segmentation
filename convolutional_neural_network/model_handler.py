@@ -46,8 +46,8 @@ class ModelHandler:
     def build(self, compile_model=True):
         input_layer = Input(shape=self.input_shape)
         backbone_h = BackboneHandler(self.backbone)
-        x = backbone_h.build(input_layer, num_classes=self.color_coding)
-        logistics_h = LogisticsHandler(log_type="fcn")
+        x = backbone_h.build(input_layer)
+        logistics_h = LogisticsHandler(log_type="fcn", num_classes=len(self.color_coding))
         x = logistics_h.attach(x)
 
         self.model = Model(inputs=input_layer, outputs=x)

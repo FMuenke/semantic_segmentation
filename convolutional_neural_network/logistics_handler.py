@@ -1,6 +1,7 @@
 import numpy as np
 
 from keras.layers import Convolution2D, Dense, Flatten, Concatenate
+from convolutional_neural_network.layer.up_sample import UpSample
 
 
 class LogisticsHandler:
@@ -11,7 +12,8 @@ class LogisticsHandler:
     def attach(self, x):
         if self.log_type == "fcn":
             assert self.num_classes is not None, "Number of classes needs to be given"
-            return Convolution2D(self.num_classes, (1, 1), activation="sigmoid")(x)
+            x = Convolution2D(self.num_classes, (1, 1), activation="sigmoid")(x)
+            return UpSample()(x)
 
         raise ValueError("{} is not known".format(self.log_type))
 
