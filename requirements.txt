@@ -2,3 +2,4 @@ opencv-python
 tqdm
 tensorflow-gpu==1.14
 keras==2.0.8
+scikit-image

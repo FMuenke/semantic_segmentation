@@ -1,4 +1,4 @@
-from machine_learning.image_handler import ImageHandler
+from data_structure.image_handler import ImageHandler
 
 
 class Preprocessor:

@@ -37,7 +37,8 @@ class LbmTag:
         return None
 
     def load_x(self):
-        return cv2.imread(self.path_to_label_file)
+
+        return cv2.imread(self.path_to_image_file)
 
     def load_y(self, label_size):
         y_img = np.zeros((label_size[0], label_size[1], len(self.color_coding)))
@@ -51,5 +52,9 @@ class LbmTag:
                                 and lbm[y, x, 1] == self.color_coding[cls][0][1] \
                                 and lbm[y, x, 2] == self.color_coding[cls][0][0]:
                             y_img[y, x, idx] = 1
+        return y_img
 
-        return cv2.resize(y_img, (300, 300), interpolation=cv2.INTER_NEAREST)
+    def write_result(self, res_path, color_map):
+        im_id = os.path.basename(self.path_to_image_file)
+        res_file = os.path.join(res_path, im_id)
+        cv2.imwrite(res_file, color_map)

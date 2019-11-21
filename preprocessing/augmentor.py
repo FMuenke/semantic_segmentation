@@ -32,7 +32,7 @@ def apply_brightening(img):
     return img
 
 
-def apply_horizontal_flip(img):
+def apply_horizontal_flip(img, lab):
     """
     Applys a horizontal flip to image and its annotated bounding-boxes
     :param img: original image
@@ -42,15 +42,21 @@ def apply_horizontal_flip(img):
         bboxes: flipped bboxes
     """
     img = cv2.flip(img, 1)
-    return img
+    lab = cv2.flip(lab, 1)
+    if len(lab.shape) == 2:
+        lab = np.expand_dims(lab, axis=2)
+    return img, lab
 
 
-def apply_vertical_flip(img):
+def apply_vertical_flip(img, lab):
     img = cv2.flip(img, 0)
-    return img
+    lab = cv2.flip(lab, 0)
+    if len(lab.shape) == 2:
+        lab = np.expand_dims(lab, axis=2)
+    return img, lab
 
 
-def apply_crop(img):
+def apply_crop(img, lab):
     height, width, ch = img.shape
     prz_zoom = 0.10
     w_random = int(width * prz_zoom)
@@ -70,34 +76,36 @@ def apply_crop(img):
         y2_img = height
 
     img = img[y1_img:y2_img, x1_img:x2_img, :]
-    return img
+    lab = lab[y1_img:y2_img, x1_img:x2_img, :]
+    return img, lab
 
 
-def apply_rotation_90(img):
+def apply_rotation_90(img, lab):
     angle = np.random.choice([0, 90, 180, 270])
 
     if angle == 270:
         img = np.transpose(img, (1, 0, 2))
         img = cv2.flip(img, 0)
+        lab = np.transpose(lab, (1, 0, 2))
+        lab = cv2.flip(lab, 0)
+        if len(lab.shape) == 2:
+            lab = np.expand_dims(lab, axis=2)
     elif angle == 180:
         img = cv2.flip(img, -1)
+        lab = cv2.flip(lab, -1)
+        if len(lab.shape) == 2:
+            lab = np.expand_dims(lab, axis=2)
     elif angle == 90:
         img = np.transpose(img, (1, 0, 2))
         img = cv2.flip(img, 1)
+        lab = np.transpose(lab, (1, 0, 2))
+        lab = cv2.flip(lab, 1)
+        if len(lab.shape) == 2:
+            lab = np.expand_dims(lab, axis=2)
     elif angle == 0:
         pass
 
-    return img
-
-
-def apply_tiny_rotation(img):
-    rows, cols = img.shape[:2]
-    angle = np.random.randint(20) - 10
-    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
-    img = cv2.warpAffine(img, M, (cols, rows))
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    return img
+    return img, lab
 
 
 class Augmentor:
@@ -109,19 +117,19 @@ class Augmentor:
             "auto_contrast": True,
             "brightening": True,
             "blur": True,
-            "crop": True,
+            "crop": False,
             "rotation": True,
         }
 
-    def apply(self, img):
+    def apply(self, img, lab):
 
         # Augmentation (randomized)
 
         if 0 == np.random.randint(6) and self.opt["horizontal_flip"]:
-            img = apply_horizontal_flip(img)
+            img, lab = apply_horizontal_flip(img, lab)
 
         if 0 == np.random.randint(4) and self.opt["vertical_flip"]:
-            img = apply_vertical_flip(img)
+            img, lab = apply_vertical_flip(img, lab)
 
         if 0 == np.random.randint(5) and self.opt["noise"]:
             img = apply_noise(img)
@@ -136,12 +144,14 @@ class Augmentor:
             img = apply_blurr(img)
 
         if 0 == np.random.randint(6) and self.opt["crop"]:
-            img = apply_crop(img)
+            img, lab = apply_crop(img, lab)
 
         # if np.random.randint(4):
         #    img = apply_tiny_rotation(img)
 
         if 0 == np.random.randint(6) and self.opt["rotation"]:
-            img = apply_rotation_90(img)
+            img, lab = apply_rotation_90(img, lab)
 
-        return img
+        if len(lab.shape) == 2:
+            lab = np.expand_dims(lab, axis=2)
+        return img, lab

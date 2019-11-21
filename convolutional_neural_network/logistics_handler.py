@@ -1,33 +1,28 @@
 import numpy as np
 
-from keras.layers import Convolution2D, Dense, Flatten, Concatenate
-from convolutional_neural_network.layer.up_sample import UpSample
-
 
 class LogisticsHandler:
     def __init__(self, log_type, num_classes=None):
         self.log_type = log_type
         self.num_classes = num_classes
 
-    def attach(self, x):
-        if self.log_type == "fcn":
-            assert self.num_classes is not None, "Number of classes needs to be given"
-            x = Convolution2D(self.num_classes, (1, 1), activation="sigmoid")(x)
-            return UpSample()(x)
-
-        raise ValueError("{} is not known".format(self.log_type))
-
     def loss(self):
         if self.log_type == "fcn":
             return "binary_crossentropy"
 
-    def decode(self, y_pred):
+    def decode(self, y_pred, color_coding):
         if self.log_type == "fcn":
-            return self._decode_fcn(y_pred)
+            return self._decode_fcn(y_pred, color_coding)
 
         raise ValueError("{} is not known".format(self.log_type))
 
-    def _decode_fcn(self, y_pred):
-        class_idx = np.argmax(y_pred, axis=1)
-        confidence = np.max(y_pred, axis=1)
-        return class_idx
+    def _decode_fcn(self, y_pred, color_coding):
+        y_pred = y_pred[0, :, :, :]
+        h, w = y_pred.shape[:2]
+        color_map = np.zeros((h, w, 3))
+        for x in range(w):
+            for y in range(h):
+                for i, cls in enumerate(color_coding):
+                    if y_pred[y, x, i] > 0.2:
+                        color_map[y, x, :] = color_coding[cls][1]
+        return color_map

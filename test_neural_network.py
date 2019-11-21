@@ -1,29 +1,31 @@
 import argparse
+import os
 
-from data_transformation.coder import Coder
+from tqdm import tqdm
 
-from neural_network.model_handler import ModelHandler
-
-from data_structure.data_loader import DataLoader
-from data_structure.generator import Generator
-
-from utils.config_utils import load_config
+from options.config import load_config
+from data_structure.data_set import DataSet
+from data_structure.folder import Folder
+from convolutional_neural_network.model_handler import ModelHandler
 
 
 def main(args_):
     df = args_.dataset_folder
     mf = args_.model_folder
     cfg = load_config(model_dir=mf)
-    model_handler = ModelHandler(mf, cfg, inference=False)
-    model = model_handler.load_model(model_dir=mf)
-    coder = Coder(df, cfg, name="convolutional_neural_network")
+    model_handler = ModelHandler(mf, cfg)
 
-    data_loader = DataLoader(df)
-    img_ids = data_loader.obj_ids
+    model_handler.build()
 
-    gen = Generator(coder, mf, cfg)
+    res_fol = Folder(os.path.join(df, "segmentations"))
+    res_fol.check_n_make_dir(clean=True)
 
-    gen.predict(model, img_ids)
+    d_set = DataSet(df, cfg.color_coding)
+    t_set = d_set.load()
+
+    for tid in tqdm(t_set):
+        color_map = model_handler.predict(t_set[tid].load_x())
+        t_set[tid].write_result(res_fol.path(), color_map)
 
 
 def parse_args():
@@ -35,7 +37,7 @@ def parse_args():
         help="Path to directory with images and labels folder",
     )
     parser.add_argument(
-        "--model_folder", "-m", default="./model/test", help="Path to model directory"
+        "--model_folder", "-m", default="./test", help="Path to model directory"
     )
     return parser.parse_args()
 

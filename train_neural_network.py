@@ -14,7 +14,7 @@ def main(args_):
     cfg = Config()
 
     model_handler = ModelHandler(mf, cfg)
-    model_h = model_handler.build()
+    model_handler.build()
 
     save_config(model_dir=mf, cfg=cfg)
 
@@ -22,7 +22,7 @@ def main(args_):
     tag_set = d_set.load()
     train_set, validation_set = d_set.split(tag_set)
 
-    model_h.fit(train_set, validation_set)
+    model_handler.fit(train_set, validation_set)
 
 
 def parse_args():
@@ -34,7 +34,7 @@ def parse_args():
         help="Path to directory with predictions",
     )
     parser.add_argument(
-        "--model_folder", "-m", default="./model/test", help="Path to model directory"
+        "--model_folder", "-m", default="./test", help="Path to model directory"
     )
     return parser.parse_args()
 

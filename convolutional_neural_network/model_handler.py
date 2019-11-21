@@ -7,7 +7,7 @@ from keras.models import Model
 from keras.callbacks import ModelCheckpoint
 
 
-from convolutional_neural_network.backbone_handler import BackboneHandler
+from convolutional_neural_network.backbones.backbone_handler import BackboneHandler
 from convolutional_neural_network.logistics_handler import LogisticsHandler
 from convolutional_neural_network.data_generator import DataGenerator
 
@@ -34,8 +34,8 @@ class ModelHandler:
 
     def predict(self, data):
         y_pred = self.inference(data)
-        logistics_h = LogisticsHandler(log_type="fcn")
-        return logistics_h.decode(y_pred)[0]
+        logistics_h = LogisticsHandler(log_type="fcn", num_classes=len(self.color_coding))
+        return logistics_h.decode(y_pred, self.color_coding)
 
     def inference(self, data):
         preprocessor = Preprocessor(self.input_shape)
@@ -45,27 +45,29 @@ class ModelHandler:
 
     def build(self, compile_model=True):
         input_layer = Input(shape=self.input_shape)
-        backbone_h = BackboneHandler(self.backbone)
+        backbone_h = BackboneHandler(self.backbone, len(self.color_coding))
         x = backbone_h.build(input_layer)
         logistics_h = LogisticsHandler(log_type="fcn", num_classes=len(self.color_coding))
-        x = logistics_h.attach(x)
 
         self.model = Model(inputs=input_layer, outputs=x)
 
         self.load()
 
         if compile_model:
-            self.model.compile(loss=logistics_h.loss(), optimizer=self.optimizer)
+            self.model.compile(loss=logistics_h.loss(), optimizer=self.optimizer, metrics=["accuracy"])
 
     def load(self):
         model_path = None
-        pot_models = sorted(os.listdir(self.model_folder))
-        for model in pot_models:
-            if model.lower().endswith((".hdf5", ".h5")):
-                model_path = os.path.join(self.model_folder, model)
-        print("Model-Weights are loaded from: {}".format(model_path))
-
-        self.model.load_weights(model_path, by_name=True)
+        if os.path.isdir(self.model_folder):
+            pot_models = sorted(os.listdir(self.model_folder))
+            for model in pot_models:
+                if model.lower().endswith((".hdf5", ".h5")):
+                    model_path = os.path.join(self.model_folder, model)
+            if model_path is not None:
+                self.model.load_weights(model_path, by_name=True)
+                print("Model-Weights are loaded from: {}".format(model_path))
+        else:
+            print("No Weights were found")
 
     def fit(self, tag_set_train, tag_set_test):
         if None in self.input_shape:
@@ -76,13 +78,15 @@ class ModelHandler:
         val_steps = int(len(tag_set_test) / self.batch_size)
         training_generator = DataGenerator(
             tag_set_train,
-            target_image_size=self.input_shape[:2],
+            image_size=self.input_shape[:2],
+            label_size=self.input_shape[:2],
             batch_size=self.batch_size,
             augmentor=Augmentor()
         )
         validation_generator = DataGenerator(
             tag_set_test,
-            target_image_size=self.input_shape[:2],
+            image_size=self.input_shape[:2],
+            label_size=self.input_shape[:2],
             batch_size=self.batch_size
         )
 

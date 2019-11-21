@@ -1,7 +1,7 @@
 import keras
 import numpy as np
 
-from data_structure.preprocessor import Preprocessor
+from preprocessing.preprocessor import Preprocessor
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -71,12 +71,13 @@ class DataGenerator(keras.utils.Sequence):
 
         for i, tag in enumerate(tags_temp):
             img = tag.load_x()
-            if self.augmentor is not None:
-                img = self.augmentor.apply(img)
-            preprocessor = Preprocessor(image_size=self.image_size)
-            img = preprocessor.apply(img)
             lab = tag.load_y(self.label_size)
 
+            if self.augmentor is not None:
+                img, lab = self.augmentor.apply(img, lab)
+
+            preprocessor = Preprocessor(image_size=self.image_size)
+            img = preprocessor.apply(img)
             x.append(img)
             y.append(lab)
 

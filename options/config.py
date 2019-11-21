@@ -1,16 +1,17 @@
 import os
 import pickle
+from data_structure.folder import Folder
 
 
 class Config:
     def __init__(self):
 
         self.color_coding = {
-            "crack": [[255, 255, 255], [255, 0, 0]]
+            "man_hole": [[1, 1, 1], [255, 0, 0]]
         }
 
-        self.backbone = "resnet"
-        self.input_size = None
+        self.backbone = "unet"
+        self.input_shape = [256, 256, 3]
 
         self.use_augmentation = True
 
@@ -36,5 +37,7 @@ def load_config(model_dir):
 
 def save_config(model_dir, cfg):
     print("config.pickle is saved to {}".format(model_dir))
+    fol = Folder(model_dir)
+    fol.check_n_make_dir()
     with open(os.path.join(model_dir, "config.pickle"), "wb") as config_f:
         pickle.dump(cfg, config_f)
