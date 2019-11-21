@@ -570,7 +570,7 @@ class PSPNet:
         self.num_classes = num_classes
         self.out_f = output_function
 
-    def backbone(self, input_tensor):
+    def build(self, input_tensor):
         output_stride = 16
         num_blocks = 4
         multigrid = [1, 1, 1]

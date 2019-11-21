@@ -44,7 +44,11 @@ class ModelHandler:
         return self.model.predict(img)
 
     def build(self, compile_model=True):
-        input_layer = Input(shape=self.input_shape)
+        input_layer = Input(batch_shape=(self.batch_size,
+                                         self.input_shape[0],
+                                         self.input_shape[1],
+                                         self.input_shape[2],
+                                         ))
         backbone_h = BackboneHandler(self.backbone, len(self.color_coding))
         x = backbone_h.build(input_layer)
         logistics_h = LogisticsHandler(log_type="fcn", num_classes=len(self.color_coding))

@@ -10,8 +10,8 @@ class Config:
             "man_hole": [[1, 1, 1], [255, 0, 0]]
         }
 
-        self.backbone = "unet"
-        self.input_shape = [256, 256, 3]
+        self.backbone = "pspnet"
+        self.input_shape = [512, 512, 3]
 
         self.use_augmentation = True
 

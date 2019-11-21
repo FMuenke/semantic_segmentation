@@ -23,6 +23,6 @@ class LogisticsHandler:
         for x in range(w):
             for y in range(h):
                 for i, cls in enumerate(color_coding):
-                    if y_pred[y, x, i] > 0.2:
+                    if y_pred[y, x, i] > 0.5:
                         color_map[y, x, :] = color_coding[cls][1]
         return color_map

@@ -58,3 +58,22 @@ class LbmTag:
         im_id = os.path.basename(self.path_to_image_file)
         res_file = os.path.join(res_path, im_id)
         cv2.imwrite(res_file, color_map)
+
+    def eval(self, color_map, stats_handler):
+        height, width = color_map.shape[:2]
+        if self.path_to_label_file is not None:
+            lbm = cv2.imread(self.path_to_label_file)
+            lbm = cv2.resize(lbm, (height, width), interpolation=cv2.INTER_NEAREST)
+            for idx, cls in enumerate(self.color_coding):
+                for x in range(width):
+                    for y in range(height):
+                        a = lbm[y, x, :] == self.color_coding[cls][0]
+                        b = color_map[y, x, :] == self.color_coding[cls][1]
+                        if a.all():
+                            if b.all():
+                                stats_handler.count(cls, "tp")
+                            else:
+                                stats_handler.count(cls, "fn")
+                        else:
+                            if b.all():
+                                stats_handler.count(cls, "fp")

@@ -13,7 +13,7 @@ class SegNet:
         self.num_classes = num_classes
         self.out_f = output_function
 
-    def backbone(self, input_tensor):
+    def build(self, input_tensor):
         x = input_tensor
         # Encoder
         x = Convolution2D(64, kernel_size=3, padding="same")(x)
@@ -54,5 +54,6 @@ class SegNet:
         x = Convolution2D(64, kernel_size=3, padding="same")(x)
         x = BatchNormalization()(x)
 
+        x = Convolution2D(self.num_classes, kernel_size=3, padding="same")(x)
         out = Activation(self.out_f)(x)
         return out

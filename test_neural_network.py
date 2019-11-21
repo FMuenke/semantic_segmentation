@@ -8,6 +8,8 @@ from data_structure.data_set import DataSet
 from data_structure.folder import Folder
 from convolutional_neural_network.model_handler import ModelHandler
 
+from data_structure.stats_handler import StatsHandler
+
 
 def main(args_):
     df = args_.dataset_folder
@@ -23,9 +25,14 @@ def main(args_):
     d_set = DataSet(df, cfg.color_coding)
     t_set = d_set.load()
 
+    sh = StatsHandler(cfg.color_coding)
     for tid in tqdm(t_set):
         color_map = model_handler.predict(t_set[tid].load_x())
         t_set[tid].write_result(res_fol.path(), color_map)
+        t_set[tid].eval(color_map, sh)
+
+    sh.eval()
+    sh.show()
 
 
 def parse_args():

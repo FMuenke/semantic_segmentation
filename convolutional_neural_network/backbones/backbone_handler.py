@@ -1,4 +1,6 @@
 from convolutional_neural_network.backbones.unet import UNet
+from convolutional_neural_network.backbones.pspnet import PSPNet
+from convolutional_neural_network.backbones.segnet import SegNet
 
 
 class BackboneHandler:
@@ -10,6 +12,14 @@ class BackboneHandler:
         if self.backbone_type == "unet":
             unet = UNet(self.num_classes)
             return unet.build(input_layer)
+
+        if self.backbone_type == "pspnet":
+            pspnet = PSPNet(self.num_classes)
+            return pspnet.build(input_layer)
+
+        if self.backbone_type == "segnet":
+            segnet = SegNet(self.num_classes)
+            return segnet.build(input_layer)
 
         raise ValueError("{} Backbone was not recognised".format(self.backbone_type))
 
