@@ -26,7 +26,10 @@ class ModelHandler:
         self.model = None
 
         self.optimizer = optimizers.adam(lr=1e-6)
-        self.batch_size = 8
+        if hasattr(cfg, "batch_size"):
+            self.batch_size = cfg.batch_size
+        else:
+            self.batch_size = 1
         self.epochs = 200
 
     def predict_tag(self, tag):

@@ -16,11 +16,14 @@ def main(args_):
     mf = args_.model_folder
     cfg = load_config(model_dir=mf)
     model_handler = ModelHandler(mf, cfg)
-
+    model_handler.batch_size = 1
     model_handler.build()
 
     res_fol = Folder(os.path.join(df, "segmentations"))
     res_fol.check_n_make_dir(clean=True)
+
+    vis_fol = Folder(os.path.join(df, "overlays"))
+    vis_fol.check_n_make_dir(clean=True)
 
     d_set = DataSet(df, cfg.color_coding)
     t_set = d_set.load()
@@ -30,9 +33,11 @@ def main(args_):
         color_map = model_handler.predict(t_set[tid].load_x())
         t_set[tid].write_result(res_fol.path(), color_map)
         t_set[tid].eval(color_map, sh)
+        t_set[tid].visualize_result(vis_fol.path(), color_map)
 
     sh.eval()
     sh.show()
+    sh.write_report(os.path.join(df, "report.txt"))
 
 
 def parse_args():

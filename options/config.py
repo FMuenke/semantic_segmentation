@@ -10,21 +10,13 @@ class Config:
             "man_hole": [[1, 1, 1], [255, 0, 0]]
         }
 
-        self.backbone = "pspnet"
+        self.backbone = "unet"
         self.input_shape = [512, 512, 3]
+        self.batch_size = 4
 
         self.use_augmentation = True
 
         self.class_mapping = dict()
-        self.compile()
-
-    def compile(self):
-        assert 'bg' not in self.color_coding,\
-            "class bg is added automatically and should not be manually included!"
-
-        self.class_mapping["bg"] = len(self.class_mapping)
-        for class_name in self.color_coding:
-            self.class_mapping[class_name] = len(self.class_mapping)
 
 
 def load_config(model_dir):

@@ -38,3 +38,7 @@ class StatsHandler:
     def show(self):
         r_string = self.generate_r_string()
         print(r_string)
+
+    def write_report(self, path_to_report):
+        with open(path_to_report, "w") as r:
+            r.write(self.generate_r_string())

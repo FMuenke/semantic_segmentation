@@ -99,3 +99,9 @@ class ImageHandler:
             oct_width = int(width / np.power(2, octave))
             oct_height = int(height / np.power(2, octave))
             return self.resize(height=oct_height, width=oct_width)
+
+    def overlay(self, mask):
+        height, width = self.image.shape[:2]
+        mask = cv2.resize(mask, (int(width), int(height)), interpolation=cv2.INTER_NEAREST)
+        return cv2.addWeighted(self.image.astype(np.uint8), 0.5, mask.astype(np.uint8), 0.5, 0)
+        # return mask
