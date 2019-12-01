@@ -1,6 +1,6 @@
 import os
 import pickle
-from data_structure.folder import Folder
+from semantic_segmentation.data_structure.folder import Folder
 
 
 class Config:

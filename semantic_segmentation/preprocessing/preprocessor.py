@@ -1,4 +1,4 @@
-from data_structure.image_handler import ImageHandler
+from semantic_segmentation.data_structure.image_handler import ImageHandler
 
 
 class Preprocessor:

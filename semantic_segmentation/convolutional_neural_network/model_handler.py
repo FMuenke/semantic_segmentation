@@ -7,12 +7,12 @@ from keras.models import Model
 from keras.callbacks import ModelCheckpoint
 
 
-from convolutional_neural_network.backbones.backbone_handler import BackboneHandler
-from convolutional_neural_network.logistics_handler import LogisticsHandler
-from convolutional_neural_network.data_generator import DataGenerator
+from semantic_segmentation.convolutional_neural_network.backbones.backbone_handler import BackboneHandler
+from semantic_segmentation.convolutional_neural_network.logistics_handler import LogisticsHandler
+from semantic_segmentation.convolutional_neural_network.data_generator import DataGenerator
 
-from preprocessing.augmentor import Augmentor
-from preprocessing.preprocessor import Preprocessor
+from semantic_segmentation.preprocessing.augmentor import Augmentor
+from semantic_segmentation.preprocessing.preprocessor import Preprocessor
 
 
 class ModelHandler:

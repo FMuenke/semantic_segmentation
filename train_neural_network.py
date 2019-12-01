@@ -1,10 +1,10 @@
 import argparse
 
-from convolutional_neural_network.model_handler import ModelHandler
+from semantic_segmentation.convolutional_neural_network.model_handler import ModelHandler
 
-from data_structure.data_set import DataSet
+from semantic_segmentation.data_structure.data_set import DataSet
 
-from options.config import Config, save_config
+from semantic_segmentation.options.config import Config, save_config
 
 
 def main(args_):

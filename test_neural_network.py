@@ -3,12 +3,12 @@ import os
 
 from tqdm import tqdm
 
-from options.config import load_config
-from data_structure.data_set import DataSet
-from data_structure.folder import Folder
-from convolutional_neural_network.model_handler import ModelHandler
+from semantic_segmentation.options.config import load_config
+from semantic_segmentation.data_structure.data_set import DataSet
+from semantic_segmentation.data_structure.folder import Folder
+from semantic_segmentation.convolutional_neural_network.model_handler import ModelHandler
 
-from data_structure.stats_handler import StatsHandler
+from semantic_segmentation.data_structure.stats_handler import StatsHandler
 
 
 def main(args_):

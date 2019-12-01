@@ -2,7 +2,7 @@ import os
 import numpy as np
 from data_structure.folder import Folder
 
-from data_structure.lbm_tag import LbmTag
+from semantic_segmentation.data_structure.lbm_tag import LbmTag
 
 
 class DataSet:
