@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 REQUIRED_PACKAGES = ['opencv-python',
                      'scikit-image',
                      "keras==2.0.8",
-                     "tensorflow-gpu==1.14",
+                     "tensorflow==1.14",
                      "tqdm"]
 
 setup(name='semantic-segmentation',
