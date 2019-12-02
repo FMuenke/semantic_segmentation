@@ -1,7 +1,7 @@
 import keras
 import numpy as np
 
-from semantic_segmentation.preprocessor import Preprocessor
+from semantic_segmentation.preprocessing.preprocessor import Preprocessor
 
 
 class DataGenerator(keras.utils.Sequence):

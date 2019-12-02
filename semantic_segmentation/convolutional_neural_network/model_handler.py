@@ -20,14 +20,14 @@ class ModelHandler:
         self.model_folder = model_folder
 
         self.color_coding = cfg.color_coding
-        self.input_shape = cfg.input_shape
-        self.backbone = cfg.backbone
+        self.input_shape = cfg.opt["input_shape"]
+        self.backbone = cfg.opt["backbone"]
 
         self.model = None
 
         self.optimizer = optimizers.adam(lr=1e-6)
         if hasattr(cfg, "batch_size"):
-            self.batch_size = cfg.batch_size
+            self.batch_size = cfg.opt["backbone"]
         else:
             self.batch_size = 1
         self.epochs = 200
@@ -58,6 +58,8 @@ class ModelHandler:
 
         self.model = Model(inputs=input_layer, outputs=x)
 
+        print(self.model.summary())
+
         self.load()
 
         if compile_model:
@@ -71,8 +73,10 @@ class ModelHandler:
                 if model.lower().endswith((".hdf5", ".h5")):
                     model_path = os.path.join(self.model_folder, model)
             if model_path is not None:
+                print("Model-Weights are loaded from: {}".format(model_path))
                 self.model.load_weights(model_path, by_name=True)
                 print("Model-Weights are loaded from: {}".format(model_path))
+
         else:
             print("No Weights were found")
 

@@ -1,6 +1,6 @@
-from convolutional_neural_network.backbones.unet import UNet
-from convolutional_neural_network.backbones.pspnet import PSPNet
-from convolutional_neural_network.backbones.segnet import SegNet
+from semantic_segmentation.convolutional_neural_network.backbones.unet import UNet
+from semantic_segmentation.convolutional_neural_network.backbones.pspnet import PSPNet
+from semantic_segmentation.convolutional_neural_network.backbones.segnet import SegNet
 
 
 class BackboneHandler:

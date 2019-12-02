@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from data_structure.folder import Folder
+from semantic_segmentation.data_structure.folder import Folder
 
 from semantic_segmentation.data_structure.lbm_tag import LbmTag
 

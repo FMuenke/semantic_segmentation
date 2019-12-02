@@ -1,5 +1,5 @@
 import os
-import pickle
+import json
 from semantic_segmentation.data_structure.folder import Folder
 
 
@@ -10,20 +10,21 @@ class Config:
             "man_hole": [[1, 1, 1], [255, 0, 0]]
         }
 
-        self.backbone = "unet"
-        self.input_shape = [512, 512, 3]
-        self.batch_size = 4
-
-        self.use_augmentation = True
-
-        self.class_mapping = dict()
+        self.opt = {
+            "backbone": "unet",
+            "input_shape": [256, 256, 3],
+            "batch_size": 4,
+            "use_augmentation": True,
+        }
 
 
 def load_config(model_dir):
     print("Load cfg from model directory")
-    cfg_path = os.path.join(model_dir, "config.pickle")
-    with open(cfg_path, "rb") as f_in:
-        cfg = pickle.load(f_in)
+    color_coding_path = os.path.join(model_dir, "color_coding.json")
+    opt_path = os.path.join(model_dir, "opt.json")
+    cfg = Config()
+    cfg.color_coding = load_dict(color_coding_path)
+    cfg.opt = load_dict(opt_path)
     return cfg
 
 
@@ -31,5 +32,19 @@ def save_config(model_dir, cfg):
     print("config.pickle is saved to {}".format(model_dir))
     fol = Folder(model_dir)
     fol.check_n_make_dir()
-    with open(os.path.join(model_dir, "config.pickle"), "wb") as config_f:
-        pickle.dump(cfg, config_f)
+    color_coding_path = os.path.join(model_dir, "color_coding.json")
+    opt_path = os.path.join(model_dir, "opt.json")
+    save_dict(cfg.color_coding, color_coding_path)
+    save_dict(cfg.opt, opt_path)
+
+
+def save_dict(dict_to_save, path_to_save):
+    with open(path_to_save, "w") as f:
+        j_file = json.dumps(dict_to_save)
+        f.write(j_file)
+
+
+def load_dict(path_to_load):
+    with open(path_to_load) as json_file:
+        dict_to_load = json.load(json_file)
+    return dict_to_load
