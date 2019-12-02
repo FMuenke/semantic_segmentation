@@ -58,8 +58,6 @@ class ModelHandler:
 
         self.model = Model(inputs=input_layer, outputs=x)
 
-        print(self.model.summary())
-
         self.load()
 
         if compile_model:
