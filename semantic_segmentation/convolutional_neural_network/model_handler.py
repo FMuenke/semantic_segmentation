@@ -87,15 +87,15 @@ class ModelHandler:
         val_steps = int(len(tag_set_test) / self.batch_size)
         training_generator = DataGenerator(
             tag_set_train,
-            image_size=self.input_shape[:2],
-            label_size=self.input_shape[:2],
+            image_size=self.input_shape,
+            label_size=self.input_shape,
             batch_size=self.batch_size,
             augmentor=Augmentor()
         )
         validation_generator = DataGenerator(
             tag_set_test,
-            image_size=self.input_shape[:2],
-            label_size=self.input_shape[:2],
+            image_size=self.input_shape,
+            label_size=self.input_shape,
             batch_size=self.batch_size
         )
 

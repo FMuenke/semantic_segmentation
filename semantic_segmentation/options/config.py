@@ -12,8 +12,8 @@ class Config:
 
         self.opt = {
             "backbone": "unet",
-            "input_shape": [64, 64, 3],
-            "batch_size": 2,
+            "input_shape": [64, 64, 1],
+            "batch_size": 10,
             "use_augmentation": True,
         }
 

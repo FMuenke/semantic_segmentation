@@ -1,3 +1,4 @@
+import  numpy as np
 from semantic_segmentation.data_structure.image_handler import ImageHandler
 
 
@@ -9,8 +10,6 @@ class Preprocessor:
 
     def resize(self, image):
         img_h = ImageHandler(image)
-        if self.image_size[2] == 1:
-            image = img_h.gray()
         if None in self.image_size:
             height, width = image.shape[:2]
             if height < self.min_height:
@@ -27,6 +26,10 @@ class Preprocessor:
 
     def apply(self, image):
         image = self.resize(image)
+        img_h = ImageHandler(image)
+        if self.image_size[2] == 1:
+            image = img_h.gray()
+            image = np.expand_dims(image, axis=2)
         image = self.normalize(image)
         return image
 
