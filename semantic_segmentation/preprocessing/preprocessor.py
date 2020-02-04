@@ -9,6 +9,8 @@ class Preprocessor:
 
     def resize(self, image):
         img_h = ImageHandler(image)
+        if self.image_size[2] == 1:
+            image = img_h.gray()
         if None in self.image_size:
             height, width = image.shape[:2]
             if height < self.min_height:
@@ -17,7 +19,6 @@ class Preprocessor:
             if width < self.min_width:
                 width = self.min_width
             return img_h.resize(height=height, width=width)
-
         return img_h.resize(height=self.image_size[0], width=self.image_size[1])
 
     def normalize(self, image):
