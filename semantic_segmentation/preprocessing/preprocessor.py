@@ -1,4 +1,4 @@
-import  numpy as np
+import numpy as np
 from semantic_segmentation.data_structure.image_handler import ImageHandler
 
 

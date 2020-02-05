@@ -7,13 +7,13 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            "ventricel": [[4, 4, 4], [255, 0, 0]],
+            "man_hole": [[1, 1, 1], [255, 0, 0]],
         }
 
         self.opt = {
             "backbone": "unet",
             "input_shape": [64, 64, 1],
-            "batch_size": 10,
+            "batch_size": 2,
             "use_augmentation": True,
         }
 
