@@ -15,6 +15,7 @@ class Config:
             "input_shape": [64, 64, 1],
             "batch_size": 2,
             "use_augmentation": True,
+            "padding": True,
         }
 
 

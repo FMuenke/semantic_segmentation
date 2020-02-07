@@ -22,6 +22,7 @@ class ModelHandler:
         self.color_coding = cfg.color_coding
         self.input_shape = cfg.opt["input_shape"]
         self.backbone = cfg.opt["backbone"]
+        self.padding = cfg.opt["padding"]
 
         self.model = None
 
@@ -41,7 +42,7 @@ class ModelHandler:
         return logistics_h.decode(y_pred, self.color_coding)
 
     def inference(self, data):
-        preprocessor = Preprocessor(self.input_shape)
+        preprocessor = Preprocessor(self.input_shape, padding=self.padding,)
         img = preprocessor.apply(data)
         img = np.expand_dims(img, axis=0)
         return self.model.predict(img)
@@ -90,13 +91,15 @@ class ModelHandler:
             image_size=self.input_shape,
             label_size=self.input_shape,
             batch_size=self.batch_size,
-            augmentor=Augmentor()
+            augmentor=Augmentor(),
+            padding=self.padding,
         )
         validation_generator = DataGenerator(
             tag_set_test,
             image_size=self.input_shape,
             label_size=self.input_shape,
-            batch_size=self.batch_size
+            batch_size=self.batch_size,
+            padding=self.padding,
         )
 
         checkpoint = ModelCheckpoint(
