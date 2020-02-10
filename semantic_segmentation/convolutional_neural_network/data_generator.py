@@ -80,7 +80,7 @@ class DataGenerator(keras.utils.Sequence):
 
             preprocessor = Preprocessor(image_size=self.image_size, padding=self.padding)
             img = preprocessor.apply(img)
-            lab = preprocessor.apply(lab)
+            lab = preprocessor.apply_to_label_map(lab)
             x.append(img)
             y.append(lab)
 

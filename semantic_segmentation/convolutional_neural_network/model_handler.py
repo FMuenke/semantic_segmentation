@@ -27,8 +27,8 @@ class ModelHandler:
         self.model = None
 
         self.optimizer = optimizers.adam(lr=1e-6)
-        if hasattr(cfg, "batch_size"):
-            self.batch_size = cfg.opt["backbone"]
+        if "batch_size" in cfg.opt:
+            self.batch_size = cfg.opt["batch_size"]
         else:
             self.batch_size = 1
         self.epochs = 200
@@ -45,7 +45,9 @@ class ModelHandler:
         preprocessor = Preprocessor(self.input_shape, padding=self.padding,)
         img = preprocessor.apply(data)
         img = np.expand_dims(img, axis=0)
-        return self.model.predict(img)
+        res = self.model.predict(img)
+        res = preprocessor.un_apply(res)
+        return res
 
     def build(self, compile_model=True):
         input_layer = Input(batch_shape=(self.batch_size,

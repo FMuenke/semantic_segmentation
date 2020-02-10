@@ -21,7 +21,7 @@ class LbmTag:
         Returns:
             estimated full path to label file
         """
-        path_to_label_file = self.path_to_image_file.replace("/images/", "/labels/")
+        path_to_label_file = self.path_to_image_file.replace("images", "labels")
 
         path_to_label_file = path_to_label_file[:-4] + ".png"
         if os.path.isfile(path_to_label_file):
@@ -35,11 +35,9 @@ class LbmTag:
         path_to_label_file = path_to_label_file[:-4] + "_label.tiff"
         if os.path.isfile(path_to_label_file):
             return path_to_label_file
-
         return None
 
     def load_x(self):
-
         return cv2.imread(self.path_to_image_file)
 
     def load_y(self, label_size):
@@ -65,7 +63,7 @@ class LbmTag:
         height, width = color_map.shape[:2]
         if self.path_to_label_file is not None:
             lbm = cv2.imread(self.path_to_label_file)
-            lbm = cv2.resize(lbm, (height, width), interpolation=cv2.INTER_NEAREST)
+            lbm = cv2.resize(lbm, (width, height), interpolation=cv2.INTER_NEAREST)
             for idx, cls in enumerate(self.color_coding):
                 for x in range(width):
                     for y in range(height):

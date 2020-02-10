@@ -8,12 +8,13 @@ class Config:
 
         self.color_coding = {
             "man_hole": [[1, 1, 1], [255, 0, 0]],
+            # "crack": [[3, 3, 3], [0, 255, 0]],
         }
 
         self.opt = {
             "backbone": "unet",
-            "input_shape": [64, 64, 1],
-            "batch_size": 2,
+            "input_shape": [256, 256, 1],
+            "batch_size": 10,
             "use_augmentation": True,
             "padding": True,
         }
