@@ -27,7 +27,7 @@ class ModelHandler:
 
         self.model = None
 
-        self.optimizer = optimizers.adam(lr=1e-6)
+        self.optimizer = optimizers.adam(lr=cfg.opt["init_learning_rate"])
         if "batch_size" in cfg.opt:
             self.batch_size = cfg.opt["batch_size"]
         else:

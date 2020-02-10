@@ -15,6 +15,7 @@ class Config:
             "backbone": "unet",
             "input_shape": [256, 256, 3],
             "batch_size": 10,
+            "init_learning_rate": 1e-3,
             "use_augmentation": True,
             "padding": False,
         }
