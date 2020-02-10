@@ -66,11 +66,14 @@ class Preprocessor:
 
     def lbm_resize(self, lbm, width, height):
         return cv2.resize(lbm,
-                       (int(width), int(height)),
-                       interpolation=cv2.INTER_NEAREST)
+                          (int(width), int(height)),
+                          interpolation=cv2.INTER_NEAREST)
 
     def apply_to_label_map(self, label_map):
         if not self.do_padding:
+            label_map = self.lbm_resize(label_map, width=self.image_size[1], height=self.image_size[0])
+            if len(label_map.shape) < 3:
+                label_map = np.expand_dims(label_map, axis=2)
             return label_map
         else:
             height, width, ch = label_map.shape

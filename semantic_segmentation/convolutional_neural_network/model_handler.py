@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import cv2
 from keras.layers import Input
 from keras import optimizers
 
@@ -42,7 +43,7 @@ class ModelHandler:
         return logistics_h.decode(y_pred, self.color_coding)
 
     def inference(self, data):
-        preprocessor = Preprocessor(self.input_shape, padding=self.padding,)
+        preprocessor = Preprocessor(self.input_shape, padding=self.padding)
         img = preprocessor.apply(data)
         img = np.expand_dims(img, axis=0)
         res = self.model.predict(img)
