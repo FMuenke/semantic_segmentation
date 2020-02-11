@@ -5,6 +5,9 @@ class Folder:
     def __init__(self, path_to_folder):
         self.path_to_folder = path_to_folder
 
+    def __str__(self):
+        return self.path()
+
     def check_n_make_dir(self, clean=False):
         """
         checks if a directory exits and maks one if necessary
