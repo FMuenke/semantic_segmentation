@@ -9,25 +9,33 @@ class DataSet:
     def __init__(self, path_to_data_set, color_coding):
         self.path_to_data_set = path_to_data_set
         self.img_folder = Folder(os.path.join(self.path_to_data_set, "images"))
-        self.lbm_folder = Folder(os.path.join(self.path_to_data_set, "labels"))
 
         self.color_coding = color_coding
 
+    def _load(self, tag_set, summary, path):
+        img_path = Folder(os.path.join(path, "images"))
+        if img_path.exists():
+            for img_f in os.listdir(str(img_path)):
+                file_name = os.path.join(str(img_path), img_f)
+                if os.path.isdir(file_name):
+                    self._load(tag_set, summary, file_name)
+                if img_f.endswith((".jpg", ".png", "tif")):
+                    tag_set[len(tag_set)] = LbmTag(os.path.join(str(img_path), img_f),
+                                                   self.color_coding)
+                    unique, counts = tag_set[len(tag_set)-1].summary()
+                    for u, c in zip(unique, counts):
+                        if u not in summary:
+                            summary[u] = c
+                        else:
+                            summary[u] += c
+
     def load(self):
-        assert self.img_folder.exists() and self.lbm_folder.exists(), "Abort, No data set to load found..."
+        assert self.img_folder.exists(), "Abort, No data set to load found..."
 
         tag_set = dict()
-        summary = {}
-        for img_f in os.listdir(self.img_folder.path()):
-            if img_f.endswith((".jpg", ".png", "tif")):
-                tag_set[len(tag_set)] = LbmTag(os.path.join(self.img_folder.path(), img_f),
-                                               self.color_coding)
-                unique, counts = tag_set[len(tag_set)-1].summary()
-                for u, c in zip(unique, counts):
-                    if u not in summary:
-                        summary[u] = c
-                    else:
-                        summary[u] += c
+        summary = dict()
+        self._load(tag_set, summary, str(self.img_folder))
+
         print("DataSet Summary:")
         tot = 0
         for u in summary:
