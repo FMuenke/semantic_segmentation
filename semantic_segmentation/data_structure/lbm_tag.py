@@ -12,6 +12,19 @@ class LbmTag:
 
         self.color_coding = color_coding
 
+    def summary(self):
+        y = self.load_y([100, 100])
+        unique = [0]
+        counts = [100*100]
+        for i in range(y.shape[2]):
+            u, c = np.unique(y[:, :, i], return_counts=True)
+            unique.append(i + 1)
+            if len(c) > 1:
+                counts.append(c[1])
+            else:
+                counts.append(0)
+        return unique, counts
+
     def get_pot_label_path(self):
         """
         Used to guess the matching ground truth labelfile
@@ -38,7 +51,10 @@ class LbmTag:
         return None
 
     def load_x(self):
-        return cv2.imread(self.path_to_image_file)
+        img = cv2.imread(self.path_to_image_file)
+        if img is None:
+            print(self.path_to_image_file)
+        return img
 
     def load_y(self, label_size):
         y_img = np.zeros((label_size[0], label_size[1], len(self.color_coding)))

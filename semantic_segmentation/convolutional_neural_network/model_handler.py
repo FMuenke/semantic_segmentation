@@ -24,7 +24,10 @@ class ModelHandler:
         self.input_shape = cfg.opt["input_shape"]
         self.backbone = cfg.opt["backbone"]
         self.padding = cfg.opt["padding"]
-
+        if "loss" in cfg.opt:
+            self.loss_type = cfg.opt["loss"]
+        else:
+            self.loss_type = "binary_crossentropy"
         self.model = None
 
         self.optimizer = optimizers.adam(lr=cfg.opt["init_learning_rate"])
@@ -39,7 +42,7 @@ class ModelHandler:
 
     def predict(self, data):
         y_pred = self.inference(data)
-        logistics_h = LogisticsHandler(log_type="fcn", num_classes=len(self.color_coding))
+        logistics_h = LogisticsHandler(loss_type=None, num_classes=len(self.color_coding))
         return logistics_h.decode(y_pred, self.color_coding)
 
     def inference(self, data):
@@ -58,7 +61,7 @@ class ModelHandler:
                                          ))
         backbone_h = BackboneHandler(self.backbone, len(self.color_coding))
         x = backbone_h.build(input_layer)
-        logistics_h = LogisticsHandler(log_type="fcn", num_classes=len(self.color_coding))
+        logistics_h = LogisticsHandler(loss_type=self.loss_type, num_classes=len(self.color_coding))
 
         self.model = Model(inputs=input_layer, outputs=x)
 
@@ -106,7 +109,7 @@ class ModelHandler:
         )
 
         checkpoint = ModelCheckpoint(
-            os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"),
+            os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{val_acc:.4f}.hdf5"),
             monitor="val_acc",
             verbose=1,
             save_best_only=True,

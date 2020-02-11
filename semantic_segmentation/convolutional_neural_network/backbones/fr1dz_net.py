@@ -1,13 +1,11 @@
 from keras.layers import (
     Activation,
-    BatchNormalization,
     Convolution2D,
     MaxPooling2D,
     Add,
 )
 
 from semantic_segmentation.convolutional_neural_network.layer.feature_pyramide import feature_pyramid
-from semantic_segmentation.convolutional_neural_network.layer.up_sample import UpSample
 from semantic_segmentation.convolutional_neural_network.layer.fixed_batch_normalization import FixedBatchNormalization
 
 
@@ -18,7 +16,6 @@ class Fr1dzNet:
 
     def build(self, input_tensor):
         s0 = input_tensor
-        print(s0.shape)
         # Encoder
         s1 = conv_block(s0, 3, [64, 64, 256], stage=1, block="a", strides=(1, 1))
         s1 = identity_block(s1, 3, [64, 64, 256], stage=1, block="b")
@@ -53,8 +50,6 @@ class Fr1dzNet:
         f2 = feature_pyramid(lower_block=s2, upper_block=f3, stage=2)
 
         f1 = feature_pyramid(lower_block=s1, upper_block=f2, stage=1)
-
-        print(f1.shape)
 
         x = f1
 

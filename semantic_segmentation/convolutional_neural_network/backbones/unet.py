@@ -2,9 +2,8 @@ from keras.layers import (
     Convolution2D,
     MaxPooling2D,
     UpSampling2D,
-    Dropout,
+    BatchNormalization,
     Concatenate,
-    Activation
 )
 
 from semantic_segmentation.convolutional_neural_network.layer.up_sample import UpSample
@@ -14,53 +13,51 @@ class UNet:
     def __init__(self, num_classes, output_function="sigmoid"):
         self.num_classes = num_classes
         self.out_f = output_function
+        self.dyn_up_sampling = True
+        self.batch_norm = True
+
+    def enc_unit(self, x, num_filter, stage):
+        conv = Convolution2D(num_filter, 3, activation='relu', padding='same', kernel_initializer='he_normal',
+                             name="unet_conv{}1".format(stage))(x)
+        if self.batch_norm:
+            conv = BatchNormalization()(conv)
+        conv = Convolution2D(num_filter, 3, activation='relu', padding='same', kernel_initializer='he_normal',
+                             name="unet_conv{}2".format(stage))(conv)
+        if self.batch_norm:
+            conv = BatchNormalization()(conv)
+        pool = MaxPooling2D(pool_size=(2, 2))(conv)
+        return pool, conv
+
+    def dec_unit(self, convh, convl, num_filter, stage):
+        if self.dyn_up_sampling:
+            up = UpSample()([convh, convl])
+        else:
+            up = UpSampling2D()(convh)
+        up = Convolution2D(num_filter, 2, activation='relu', padding='same', kernel_initializer='he_normal',
+                           name="unet_up{}0".format(stage))(up)
+        merge = Concatenate(axis=3)([convl, up])
+        conv = Convolution2D(num_filter, 3, activation='relu', padding='same', kernel_initializer='he_normal',
+                             name="unet_up{}1".format(stage))(merge)
+        if self.batch_norm:
+            conv = BatchNormalization()(conv)
+        conv = Convolution2D(num_filter, 3, activation='relu', padding='same', kernel_initializer='he_normal',
+                             name="unet_up{}2".format(stage))(conv)
+        if self.batch_norm:
+            conv = BatchNormalization()(conv)
+        return conv
 
     def build(self, input_tensor):
-        conv1 = Convolution2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv11")(input_tensor)
-        conv1 = Convolution2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv12")(conv1)
-        pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
-        conv2 = Convolution2D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv21")(pool1)
-        conv2 = Convolution2D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv22")(conv2)
-        pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
-        conv3 = Convolution2D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv31")(pool2)
-        conv3 = Convolution2D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv32")(conv3)
-        pool3 = MaxPooling2D(pool_size=(2, 2))(conv3)
-        conv4 = Convolution2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv41")(pool3)
-        conv4 = Convolution2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv42")(conv4)
-        drop4 = Dropout(0.5)(conv4)
-        pool4 = MaxPooling2D(pool_size=(2, 2))(drop4)
 
-        conv5 = Convolution2D(1024, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv51")(pool4)
-        conv5 = Convolution2D(1024, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv52")(conv5)
-        drop5 = Dropout(0.5)(conv5)
+        pool1, conv1 = self.enc_unit(input_tensor, 64, stage=1)
+        pool2, conv2 = self.enc_unit(pool1, 128, stage=2)
+        pool3, conv3 = self.enc_unit(pool2, 256, stage=3)
+        pool4, conv4 = self.enc_unit(pool3, 512, stage=4)
+        _, conv5 = self.enc_unit(pool4, 1024, stage=5)
 
-        up6 = Convolution2D(512, 2, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_up6")(
-            UpSampling2D(size=(2, 2))(drop5))
-        up6 = UpSample()([up6, drop4])
-        merge6 = Concatenate(axis=3)([drop4, up6])
-        conv6 = Convolution2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv61")(merge6)
-        conv6 = Convolution2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv62")(conv6)
-
-        up7 = Convolution2D(256, 2, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_up7")(
-            UpSampling2D(size=(2, 2))(conv6))
-        up7 = UpSample()([up7, conv3])
-        merge7 = Concatenate(axis=3)([conv3, up7])
-        conv7 = Convolution2D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv71")(merge7)
-        conv7 = Convolution2D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv72")(conv7)
-
-        up8 = Convolution2D(128, 2, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_up8")(
-            UpSampling2D(size=(2, 2))(conv7))
-        up8 = UpSample()([up8, conv2])
-        merge8 = Concatenate(axis=3)([conv2, up8])
-        conv8 = Convolution2D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv81")(merge8)
-        conv8 = Convolution2D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv82")(conv8)
-
-        up9 = Convolution2D(64, 2, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_up9")(
-            UpSampling2D(size=(2, 2))(conv8))
-        up9 = UpSample()([up9, conv1])
-        merge9 = Concatenate(axis=3)([conv1, up9])
-        conv9 = Convolution2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv91")(merge9)
-        conv9 = Convolution2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal', name="unet_conv92")(conv9)
+        conv6 = self.dec_unit(conv5, conv4, 512, stage=6)
+        conv7 = self.dec_unit(conv6, conv3, 256, stage=7)
+        conv8 = self.dec_unit(conv7, conv2, 128, stage=8)
+        conv9 = self.dec_unit(conv8, conv1, 64, stage=9)
 
         out = Convolution2D(self.num_classes,
                             3,

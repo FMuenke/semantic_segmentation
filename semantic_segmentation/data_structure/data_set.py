@@ -17,9 +17,23 @@ class DataSet:
         assert self.img_folder.exists() and self.lbm_folder.exists(), "Abort, No data set to load found..."
 
         tag_set = dict()
+        summary = {}
         for img_f in os.listdir(self.img_folder.path()):
-            tag_set[len(tag_set)] = LbmTag(os.path.join(self.img_folder.path(), img_f),
-                                           self.color_coding)
+            if img_f.endswith((".jpg", ".png", "tif")):
+                tag_set[len(tag_set)] = LbmTag(os.path.join(self.img_folder.path(), img_f),
+                                               self.color_coding)
+                unique, counts = tag_set[len(tag_set)-1].summary()
+                for u, c in zip(unique, counts):
+                    if u not in summary:
+                        summary[u] = c
+                    else:
+                        summary[u] += c
+        print("DataSet Summary:")
+        tot = 0
+        for u in summary:
+            tot += summary[u]
+        for u in summary:
+            print("ClassIdx {}: {}".format(u, summary[u]/tot))
         return tag_set
 
     def split(self, tag_set, percentage=0.2):
