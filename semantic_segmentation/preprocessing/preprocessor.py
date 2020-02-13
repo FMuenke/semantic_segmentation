@@ -26,7 +26,8 @@ class Preprocessor:
 
     def normalize(self, image):
         img_h = ImageHandler(image)
-        return img_h.normalize()
+        norm = img_h.normalize()
+        return norm / 255
 
     def pad(self, image):
         img_h = ImageHandler(image)
