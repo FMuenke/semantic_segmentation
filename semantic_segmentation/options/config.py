@@ -7,14 +7,14 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            "heart": [[4, 4, 4], [0, 255, 0]],
+            "crack": [[1, 1, 1], [0, 255, 0]],
         }
 
         self.opt = {
-            "backbone": "unet",
+            "backbone": "segnet",
             "loss": "focal_loss",
-            "input_shape": [512, 512, 3],
-            "batch_size": 2,
+            "input_shape": [512, 512, 1],
+            "batch_size": 1,
             "init_learning_rate": 1e-5,
             "use_augmentation": True,
             "padding": True,

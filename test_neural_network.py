@@ -19,10 +19,10 @@ def main(args_):
     model_handler.batch_size = 1
     model_handler.build()
 
-    res_fol = Folder(os.path.join(df, "segmentations"))
+    res_fol = Folder(os.path.join(mf, "segmentations"))
     res_fol.check_n_make_dir(clean=True)
 
-    vis_fol = Folder(os.path.join(df, "overlays"))
+    vis_fol = Folder(os.path.join(mf, "overlays"))
     vis_fol.check_n_make_dir(clean=True)
 
     d_set = DataSet(df, cfg.color_coding)
@@ -37,7 +37,7 @@ def main(args_):
 
     sh.eval()
     sh.show()
-    sh.write_report(os.path.join(df, "report.txt"))
+    sh.write_report(os.path.join(mf, "report.txt"))
 
 
 def parse_args():

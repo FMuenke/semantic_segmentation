@@ -1,9 +1,8 @@
 import keras.backend as K
-from keras.models import Model
 from keras.engine import InputSpec
 from keras.utils import conv_utils
 from keras.engine.topology import Layer
-from keras.layers import Input, Reshape, Permute, Dense, Activation, Conv2D
+from keras.layers import Reshape, Permute, Dense, Activation, Conv2D
 from keras.layers import MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
 from keras.layers import ZeroPadding2D, Lambda, Conv2DTranspose
 from keras.layers import merge, multiply, add, concatenate, BatchNormalization

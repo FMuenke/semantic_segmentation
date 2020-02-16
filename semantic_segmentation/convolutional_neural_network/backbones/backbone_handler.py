@@ -14,6 +14,10 @@ class BackboneHandler:
             unet = UNet(self.num_classes)
             return unet.build(input_layer)
 
+        if self.backbone_type == "unet_reduced":
+            unet = UNet(self.num_classes, reduced=True)
+            return unet.build(input_layer)
+
         if self.backbone_type == "pspnet":
             pspnet = PSPNet(self.num_classes)
             return pspnet.build(input_layer)
