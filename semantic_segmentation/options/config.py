@@ -7,14 +7,14 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            "crack": [[1, 1, 1], [0, 255, 0]],
+            "man_hole": [[1, 1, 1], [0, 255, 0]],
             # "crack": [[3, 3, 3], [255, 255, 0]],
         }
 
         self.opt = {
-            "backbone": "fr1dz",
-            "loss": "focal_loss",
-            "input_shape": [1024, 1024, 1],
+            "backbone": "unet",
+            "loss": "focal",
+            "input_shape": [256, 256, 3],
             "batch_size": 1,
             "init_learning_rate": 1e-5,
             "use_augmentation": True,
