@@ -25,9 +25,17 @@ class Preprocessor:
         return img_h.resize(height=self.image_size[0], width=self.image_size[1])
 
     def normalize(self, image):
-        img_h = ImageHandler(image)
-        norm = img_h.normalize()
-        return norm / 255
+        epsilon = 1e-6
+        mean_mat = np.mean(image)
+        var_mat = np.var(image)
+        if var_mat != 0:
+            mat_norm = (image - mean_mat) / var_mat
+            min_mat = np.min(mat_norm)
+            max_mat = np.max(mat_norm)
+            mat_norm = (mat_norm - min_mat) / (max_mat - min_mat + epsilon)
+        else:
+            mat_norm = np.zeros(image.shape)
+        return mat_norm
 
     def pad(self, image):
         img_h = ImageHandler(image)

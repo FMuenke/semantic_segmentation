@@ -74,7 +74,7 @@ class LbmTag:
 
     def write_result(self, res_path, color_map):
         im_id = os.path.basename(self.path_to_image_file)
-        res_file = os.path.join(res_path, im_id)
+        res_file = os.path.join(res_path, im_id[:-4]+".png")
         cv2.imwrite(res_file, color_map)
 
     def eval(self, color_map, stats_handler):

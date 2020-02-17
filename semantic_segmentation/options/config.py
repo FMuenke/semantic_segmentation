@@ -8,12 +8,13 @@ class Config:
 
         self.color_coding = {
             "crack": [[1, 1, 1], [0, 255, 0]],
+            # "crack": [[3, 3, 3], [255, 255, 0]],
         }
 
         self.opt = {
-            "backbone": "segnet",
+            "backbone": "fr1dz",
             "loss": "focal_loss",
-            "input_shape": [512, 512, 1],
+            "input_shape": [1024, 1024, 1],
             "batch_size": 1,
             "init_learning_rate": 1e-5,
             "use_augmentation": True,
