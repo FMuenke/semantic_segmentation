@@ -38,8 +38,6 @@ class Fr1dzNet:
         # s4 = identity_block(s4, 3, [512, 512, 2048], stage=4, block="b")
         # s4 = identity_block(s4, 3, [512, 512, 2048], stage=4, block="c")
 
-        #print(s4.shape)
-        print(s3.shape)
         # Decoder
         # f4 = feature_pyramid(lower_block=s4, upper_block=s3, stage=4)
 
@@ -52,7 +50,6 @@ class Fr1dzNet:
         x = f1
 
         x = Convolution2D(self.num_classes, kernel_size=3, padding="same", name="fr1dz_classification")(x)
-        print(x.shape)
         out = Activation(self.out_f)(x)
         return out
 
