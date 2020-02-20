@@ -49,10 +49,13 @@ class DataSet:
         assert len(tag_set) > 0, "No Data was found.."
         return tag_set
 
-    def split(self, tag_set, percentage=0.2):
+    def split(self, tag_set, percentage=0.2, random=True):
         train_set = []
         validation_set = []
-        dist = np.random.permutation(len(tag_set))
+        if random:
+            dist = np.random.permutation(len(tag_set))
+        else:
+            dist = range(len(tag_set))
         for d in dist:
             if len(validation_set) > percentage * len(tag_set):
                 train_set.append(tag_set[d])

@@ -13,14 +13,16 @@ class Config:
         }
 
         self.opt = {
-            "backbone": "segnet",
-            "loss": "focal",
+            "backbone": "unet",
+            "loss": "dice",
             "input_shape": [512, 512, 3],
-            "batch_size": 1,
+            "batch_size": 2,
             "init_learning_rate": 1e-5,
             "use_augmentation": True,
             "padding": True,
         }
+
+        self.randomized_split = False
 
 
 def load_config(model_dir):

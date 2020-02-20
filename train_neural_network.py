@@ -20,7 +20,7 @@ def main(args_):
 
     d_set = DataSet(df, cfg.color_coding)
     tag_set = d_set.load()
-    train_set, validation_set = d_set.split(tag_set)
+    train_set, validation_set = d_set.split(tag_set, random=cfg.randomized_split)
 
     model_handler.fit(train_set, validation_set)
 

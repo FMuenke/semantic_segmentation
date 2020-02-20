@@ -10,8 +10,12 @@ class BackboneHandler:
         self.num_classes = num_classes
 
     def build(self, input_layer):
-        if self.backbone_type == "unet":
+        if self.backbone_type in ["unet", "unet-relu"]:
             unet = UNet(self.num_classes)
+            return unet.build(input_layer)
+
+        if self.backbone_type == "unet-leaky-relu":
+            unet = UNet(self.num_classes, activation="leaky_relu")
             return unet.build(input_layer)
 
         if self.backbone_type == "unet_reduced":
