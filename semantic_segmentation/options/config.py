@@ -9,14 +9,15 @@ class Config:
         self.color_coding = {
             # "man_hole": [[1, 1, 1], [0, 255, 0]],
             # "crack": [[3, 3, 3], [255, 255, 0]],
-            "heart": [[4, 4, 4], [0, 255, 0]],
+            # "heart": [[4, 4, 4], [0, 255, 0]],
+            "muscle": [[255, 255, 255], [255, 0, 0]],
         }
 
         self.opt = {
-            "backbone": "unet",
-            "loss": "dice",
-            "input_shape": [512, 512, 3],
-            "batch_size": 2,
+            "backbone": "segnet",
+            "loss": "mixed",
+            "input_shape": [128, 128, 3],
+            "batch_size": 4,
             "init_learning_rate": 1e-5,
             "use_augmentation": True,
             "padding": True,
