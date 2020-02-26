@@ -8,9 +8,9 @@ class LogisticsHandler:
         self.num_classes = num_classes
 
     def loss(self):
-        if self.loss_type == "focal":
+        if self.loss_type in ["focal", "focal_loss"]:
             return focal_loss()
-        if self.loss_type == "binary_crossentropy":
+        if self.loss_type in ["binary_crossentropy", "bc"]:
             return "binary_crossentropy"
         if self.loss_type == "dice":
             return dice()

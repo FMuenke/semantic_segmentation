@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 from semantic_segmentation.preprocessing.preprocessor import Preprocessor
+from semantic_segmentation.preprocessing.label_preprocessor import LabelPreProcessor
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -75,6 +76,9 @@ class DataGenerator(keras.utils.Sequence):
         for i, tag in enumerate(tags_temp):
             img = tag.load_x()
             lab = tag.load_y((img.shape[0], img.shape[1]))
+
+            lab_pro = LabelPreProcessor()
+            lab = lab_pro.apply(lab)
 
             if self.augmentor is not None:
                 img, lab = self.augmentor.apply(img, lab)
