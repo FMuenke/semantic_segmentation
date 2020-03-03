@@ -17,6 +17,7 @@ class DataGenerator(keras.utils.Sequence):
         shuffle=False,
         augmentor=None,
         padding=False,
+        label_prep=None,
     ):
         """
         Args:
@@ -36,6 +37,7 @@ class DataGenerator(keras.utils.Sequence):
         self.shuffle = shuffle
         self.augmentor = augmentor
         self.padding = padding
+        self.label_prep = label_prep
         self.on_epoch_end()
 
     def __len__(self):
@@ -77,7 +79,7 @@ class DataGenerator(keras.utils.Sequence):
             img = tag.load_x()
             lab = tag.load_y((img.shape[0], img.shape[1]))
 
-            lab_pro = LabelPreProcessor()
+            lab_pro = LabelPreProcessor(self.label_prep)
             lab = lab_pro.apply(lab)
 
             if self.augmentor is not None:

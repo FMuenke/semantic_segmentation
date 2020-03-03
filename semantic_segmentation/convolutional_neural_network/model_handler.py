@@ -28,6 +28,11 @@ class ModelHandler:
             self.loss_type = cfg.opt["loss"]
         else:
             self.loss_type = "binary_crossentropy"
+
+        if "label_prep" in cfg.opt:
+            self.label_prep = cfg.opt["label_prep"]
+        else:
+            self.label_prep = "basic"
         self.model = None
 
         self.optimizer = optimizers.adam(lr=cfg.opt["init_learning_rate"])
@@ -59,7 +64,11 @@ class ModelHandler:
                                          self.input_shape[1],
                                          self.input_shape[2],
                                          ))
-        backbone_h = BackboneHandler(self.backbone, len(self.color_coding))
+        if self.loss_type == "mean_squared_error":
+            output_func = "linear"
+        else:
+            output_func = "sigmoid"
+        backbone_h = BackboneHandler(self.backbone, len(self.color_coding), output_func)
         x = backbone_h.build(input_layer)
         logistics_h = LogisticsHandler(loss_type=self.loss_type, num_classes=len(self.color_coding))
 
@@ -99,6 +108,7 @@ class ModelHandler:
             batch_size=self.batch_size,
             augmentor=Augmentor(),
             padding=self.padding,
+            label_prep=self.label_prep,
         )
         validation_generator = DataGenerator(
             tag_set_test,
@@ -106,6 +116,7 @@ class ModelHandler:
             label_size=self.input_shape,
             batch_size=self.batch_size,
             padding=self.padding,
+            label_prep=self.label_prep
         )
 
         checkpoint = ModelCheckpoint(

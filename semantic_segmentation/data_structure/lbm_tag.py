@@ -56,6 +56,20 @@ class LbmTag:
             print(self.path_to_image_file)
         return img
 
+    def load_y_as_color_map(self, label_size):
+        y_img = np.zeros((label_size[0], label_size[1], 3))
+        if self.path_to_label_file is not None:
+            lbm = cv2.imread(self.path_to_label_file)
+            lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
+            for idx, cls in enumerate(self.color_coding):
+                for x in range(label_size[1]):
+                    for y in range(label_size[0]):
+                        if lbm[y, x, 0] == self.color_coding[cls][0][2] \
+                                and lbm[y, x, 1] == self.color_coding[cls][0][1] \
+                                and lbm[y, x, 2] == self.color_coding[cls][0][0]:
+                            y_img[y, x, :] = self.color_coding[cls][1]
+        return y_img
+
     def load_y(self, label_size):
         y_img = np.zeros((label_size[0], label_size[1], len(self.color_coding)))
         counter = {0: 0, 1: 0}
@@ -74,8 +88,12 @@ class LbmTag:
 
     def write_result(self, res_path, color_map):
         im_id = os.path.basename(self.path_to_image_file)
+        h, w = color_map.shape[:2]
+        label = self.load_y_as_color_map((h, w))
+        border = 255 * np.ones((h, 10, 3))
+        r = np.concatenate([label, border, color_map], axis=1)
         res_file = os.path.join(res_path, im_id[:-4] + ".png")
-        cv2.imwrite(res_file, color_map)
+        cv2.imwrite(res_file, r)
 
     def eval(self, color_map, stats_handler):
         height, width = color_map.shape[:2]

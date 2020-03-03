@@ -18,7 +18,7 @@ class DataSet:
         print("Try Loading Data from: {}".format(path))
         if img_path.exists():
             print("loading...")
-            for img_f in tqdm(os.listdir(str(img_path))):
+            for img_f in tqdm(sorted(os.listdir(str(img_path)))):
                 if img_f.endswith((".jpg", ".png", "tif")):
                     tag_set[len(tag_set)] = LbmTag(os.path.join(str(img_path), img_f),
                                                    self.color_coding)
