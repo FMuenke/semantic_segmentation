@@ -31,5 +31,6 @@ class Ellipse:
         y_coord = np.linspace(0, h, h)
         X_coord, Y_coord = np.meshgrid(x_coord, y_coord)
         Z_coord = self.x[0] * X_coord ** 2 + self.x[1] * X_coord * Y_coord + self.x[2] * Y_coord ** 2 + self.x[3] * X_coord + self.x[4] * Y_coord
-        img_h = ImageHandler(np.abs(Z_coord - 1))
+        Z_coord[Z_coord < 1] = 0
+        img_h = ImageHandler(Z_coord)
         return img_h.normalize() / 255
