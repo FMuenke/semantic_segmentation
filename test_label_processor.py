@@ -1,15 +1,16 @@
 import argparse
 import os
 import cv2
+import numpy as np
 
 from tqdm import tqdm
-
+from semantic_segmentation.data_structure.image_handler import ImageHandler
 from semantic_segmentation.preprocessing.label_preprocessor import LabelPreProcessor
 
 
 def main(args_):
     df = args_.dataset_folder
-    lp = LabelPreProcessor()
+    lp = LabelPreProcessor("ellipse")
 
     ldir = os.path.join(df, "labels")
     rdir = os.path.join(df, "new_lab")
@@ -18,8 +19,12 @@ def main(args_):
     for l in tqdm(os.listdir(ldir)):
         if l.endswith(".png"):
             lbm = cv2.imread(os.path.join(ldir, l))
-            new_lbm = lp.apply(lbm)
-            cv2.imwrite(os.path.join(rdir, l), new_lbm)
+            lbm = lp.apply(lbm)
+            print(np.max(lbm), np.min(lbm))
+            print(np.unique(lbm))
+            new_lbm = ImageHandler(lbm)
+
+            cv2.imwrite(os.path.join(rdir, l), new_lbm.normalize())
 
 
 def parse_args():
