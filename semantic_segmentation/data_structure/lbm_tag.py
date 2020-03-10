@@ -45,7 +45,10 @@ class LbmTag:
         path_to_label_file = path_to_label_file[:-4] + ".tiff"
         if os.path.isfile(path_to_label_file):
             return path_to_label_file
-        path_to_label_file = path_to_label_file[:-4] + "_label.tiff"
+        path_to_label_file = path_to_label_file[:-5] + "_label.tiff"
+        if os.path.isfile(path_to_label_file):
+            return path_to_label_file
+        path_to_label_file = path_to_label_file[:-5] + ".tif"
         if os.path.isfile(path_to_label_file):
             return path_to_label_file
         return None
