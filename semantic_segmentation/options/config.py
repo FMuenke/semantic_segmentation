@@ -10,16 +10,17 @@ class Config:
             # "man_hole": [[1, 1, 1], [0, 255, 0]],
             # "crack": [[3, 3, 3], [255, 255, 0]],
             # "heart": [[4, 4, 4], [0, 255, 0]],
-            "muscle": [[255, 255, 255], [255, 0, 0]],
+            # "muscle": [[255, 255, 255], [255, 0, 0]],
+            "shadow": [[1, 1, 1], [255, 0, 0]],
         }
 
         self.opt = {
             "backbone": "unet",
             "loss": "bc",
-            "label_prep": "ellipse",
-            "input_shape": [256, 256, 3],
+            "label_prep": "basic",
+            "input_shape": [512, 512, 3],
             "batch_size": 4,
-            "init_learning_rate": 1e-5,
+            "init_learning_rate": 1e-4,
             "use_augmentation": True,
             "padding": True,
         }
