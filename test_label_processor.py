@@ -20,8 +20,6 @@ def main(args_):
         if l.endswith(".png"):
             lbm = cv2.imread(os.path.join(ldir, l))
             lbm = lp.apply(lbm)
-            print(np.max(lbm), np.min(lbm))
-            print(np.unique(lbm))
             new_lbm = ImageHandler(lbm)
 
             cv2.imwrite(os.path.join(rdir, l), new_lbm.normalize())

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from semantic_segmentation.preprocessing.ellipse import Ellipse
+from semantic_segmentation.geometric_shapes.ellipse import Ellipse
 
 
 class LabelPreProcessor:
@@ -13,8 +13,7 @@ class LabelPreProcessor:
         return label_map
 
     def _apply_for_ellipse(self, label_map):
-        e = Ellipse()
-        e.fit_from_map(label_map.astype(np.uint8))
+        e = Ellipse(label_map)
         label_map = e.map_to_array([label_map.shape[0], label_map.shape[1]])
         return label_map
 

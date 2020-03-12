@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 from semantic_segmentation.data_structure.image_handler import ImageHandler
+from semantic_segmentation.data_structure.image_handler import ImageHandler
 
 
 class LbmTag:
