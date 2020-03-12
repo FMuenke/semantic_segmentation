@@ -5,7 +5,7 @@ from keras.layers import Input
 from keras import optimizers
 
 from keras.models import Model
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 
 from semantic_segmentation.convolutional_neural_network.backbones.backbone_handler import BackboneHandler
@@ -127,7 +127,11 @@ class ModelHandler:
             mode="max",
         )
 
-        callback_list = [checkpoint]
+        reduce_lr = ReduceLROnPlateau(factor=0.5)
+
+        callback_list = [checkpoint, reduce_lr]
+
+
 
         self.model.fit_generator(
             generator=training_generator,
