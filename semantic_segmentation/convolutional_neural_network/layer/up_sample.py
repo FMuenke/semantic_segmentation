@@ -10,8 +10,9 @@ class UpSample(Layer):
 
     def call(self, x, mask=None):
         x_in, target = x
-        batch_size, height, width, nb_features = target.get_shape().as_list()
-        return tf.image.resize_images(x_in, (height, width), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+        #batch_size, height, width, nb_features = target.get_shape().as_list()
+        #size = tf.constant((height, width), dtype=tf.int32)
+        return tf.image.resize_nearest_neighbor(x_in, tf.shape(target)[1:3])
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0][0],) + input_shape[1][1:3] + (input_shape[0][-1],)

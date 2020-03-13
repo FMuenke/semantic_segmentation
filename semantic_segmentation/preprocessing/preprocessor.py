@@ -8,6 +8,8 @@ class Preprocessor:
         self.image_size = image_size
         self.min_height = 16
         self.min_width = 16
+        self.max_height = 1000
+        self.max_width = 1000
         self.do_padding = padding
 
         self.obox = None
@@ -18,9 +20,12 @@ class Preprocessor:
             height, width = image.shape[:2]
             if height < self.min_height:
                 height = self.min_height
-
             if width < self.min_width:
                 width = self.min_width
+            if height > self.max_height:
+                height = self.max_height
+            if width > self.max_width:
+                width = self.max_width
             return img_h.resize(height=height, width=width)
         return img_h.resize(height=self.image_size[0], width=self.image_size[1])
 
@@ -74,6 +79,19 @@ class Preprocessor:
         return image
 
     def lbm_resize(self, lbm, width, height):
+        if None in [width, height]:
+            height, width = lbm.shape[:2]
+            if height < self.min_height:
+                height = self.min_height
+            if width < self.min_width:
+                width = self.min_width
+            if height > self.max_height:
+                height = self.max_height
+            if width > self.max_width:
+                width = self.max_width
+            return cv2.resize(lbm,
+                              (int(width), int(height)),
+                              interpolation=cv2.INTER_NEAREST)
         return cv2.resize(lbm,
                           (int(width), int(height)),
                           interpolation=cv2.INTER_NEAREST)
