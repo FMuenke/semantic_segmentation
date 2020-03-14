@@ -19,6 +19,7 @@ def main(args_):
     for l in tqdm(os.listdir(ldir)):
         if l.endswith(".png"):
             lbm = cv2.imread(os.path.join(ldir, l))
+
             lbm = lp.apply(lbm)
             new_lbm = ImageHandler(lbm)
 

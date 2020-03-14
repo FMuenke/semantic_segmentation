@@ -68,7 +68,10 @@ class ModelHandler:
             output_func = "linear"
         else:
             output_func = "sigmoid"
-        backbone_h = BackboneHandler(self.backbone, len(self.color_coding), output_func)
+        num_classes = len(self.color_coding)
+        if self.label_prep == "ellipse":
+            num_classes = 3
+        backbone_h = BackboneHandler(self.backbone, num_classes, output_func)
         x = backbone_h.build(input_layer)
         logistics_h = LogisticsHandler(loss_type=self.loss_type, num_classes=len(self.color_coding))
 

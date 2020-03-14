@@ -14,7 +14,7 @@ class LabelPreProcessor:
 
     def _apply_for_ellipse(self, label_map):
         e = Ellipse(label_map)
-        label_map = e.map_to_array([label_map.shape[0], label_map.shape[1]])
+        label_map = e.build_label_map([label_map.shape[0], label_map.shape[1]])
         return label_map
 
     def apply(self, label_map):
@@ -23,5 +23,5 @@ class LabelPreProcessor:
             return self._apply_gauss(label_map)
         if self.label_prep == "ellipse":
             label_map = self._apply_for_ellipse(label_map)
-            label_map = np.reshape(label_map, (h, w, 1))
+            # label_map = np.reshape(label_map, (h, w, 1))
         return label_map

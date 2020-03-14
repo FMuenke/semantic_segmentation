@@ -8,8 +8,8 @@ class Preprocessor:
         self.image_size = image_size
         self.min_height = 16
         self.min_width = 16
-        self.max_height = 1000
-        self.max_width = 1000
+        self.max_height = 900
+        self.max_width = 900
         self.do_padding = padding
 
         self.obox = None
@@ -17,16 +17,7 @@ class Preprocessor:
     def resize(self, image):
         img_h = ImageHandler(image)
         if None in self.image_size:
-            height, width = image.shape[:2]
-            if height < self.min_height:
-                height = self.min_height
-            if width < self.min_width:
-                width = self.min_width
-            if height > self.max_height:
-                height = self.max_height
-            if width > self.max_width:
-                width = self.max_width
-            return img_h.resize(height=height, width=width)
+            return self.rescale(image, self.max_width, self.max_height, is_lbm=False)
         return img_h.resize(height=self.image_size[0], width=self.image_size[1])
 
     def normalize(self, image):
@@ -41,6 +32,25 @@ class Preprocessor:
         else:
             mat_norm = np.zeros(image.shape)
         return mat_norm
+
+    def rescale(self, data, max_width, max_height, is_lbm=False):
+        height, width, ch = data.shape
+        if height >= max_height:
+            new_height = max_height
+            new_width = int(width * new_height / height)
+            if is_lbm:
+                data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_NEAREST)
+            else:
+                data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_CUBIC)
+        height, width, ch = data.shape
+        if width >= max_width:
+            new_width = max_width
+            new_height = int(height * new_width / width)
+            if is_lbm:
+                data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_NEAREST)
+            else:
+                data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_CUBIC)
+        return data
 
     def pad(self, image):
         img_h = ImageHandler(image)
@@ -80,18 +90,7 @@ class Preprocessor:
 
     def lbm_resize(self, lbm, width, height):
         if None in [width, height]:
-            height, width = lbm.shape[:2]
-            if height < self.min_height:
-                height = self.min_height
-            if width < self.min_width:
-                width = self.min_width
-            if height > self.max_height:
-                height = self.max_height
-            if width > self.max_width:
-                width = self.max_width
-            return cv2.resize(lbm,
-                              (int(width), int(height)),
-                              interpolation=cv2.INTER_NEAREST)
+            return self.rescale(lbm, self.max_width, self.max_height, is_lbm=True)
         return cv2.resize(lbm,
                           (int(width), int(height)),
                           interpolation=cv2.INTER_NEAREST)
