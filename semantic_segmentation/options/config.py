@@ -21,7 +21,7 @@ class Config:
             "backbone": "unet",
             "loss": "bc",
             "label_prep": "ellipse",
-            "input_shape": [256, 256, 3],
+            "input_shape": [128, 128, 3],
             "batch_size": 2,
             "init_learning_rate": 1e-4,
             "use_augmentation": True,

@@ -44,9 +44,9 @@ class LogisticsHandler:
 
     def _decode_ellipse(self, y_pred):
         b, h, w, c = y_pred.shape
-        y_pred = y_pred[0, :, :, 0]
-        y_pred = np.reshape(y_pred, (h, w, 1))
-        y_pred = np.concatenate([y_pred, y_pred, y_pred], axis=2)
+        y_pred = y_pred[0, :, :, :]
+        # y_pred = np.reshape(y_pred, (h, w, 1))
+        # y_pred = np.concatenate([y_pred, y_pred, y_pred], axis=2)
         img_h = ImageHandler(y_pred)
         i_norm = img_h.normalize()
         return i_norm
