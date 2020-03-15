@@ -77,10 +77,7 @@ class DataGenerator(keras.utils.Sequence):
 
         for i, tag in enumerate(tags_temp):
             img = tag.load_x()
-            lab = tag.load_y((img.shape[0], img.shape[1]))
-
-            lab_pro = LabelPreProcessor(self.label_prep)
-            lab = lab_pro.apply(lab)
+            lab = tag.load_y((img.shape[0], img.shape[1]), label_prep=self.label_prep)
 
             if self.augmentor is not None:
                 img, lab = self.augmentor.apply(img, lab)

@@ -20,7 +20,7 @@ class Config:
         self.opt = {
             "backbone": "unet",
             "loss": "bc",
-            "label_prep": "ellipse",
+            "label_prep": "basic",
             "input_shape": [128, 128, 3],
             "batch_size": 2,
             "init_learning_rate": 1e-4,

@@ -47,7 +47,7 @@ class ModelHandler:
 
     def predict(self, data):
         y_pred = self.inference(data)
-        logistics_h = LogisticsHandler(loss_type=None, num_classes=len(self.color_coding))
+        logistics_h = LogisticsHandler(loss_type=None, num_classes=len(self.color_coding), label_prep=self.label_prep)
         return logistics_h.decode(y_pred, self.color_coding)
 
     def inference(self, data):

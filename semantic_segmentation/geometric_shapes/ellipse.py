@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+from scipy import ndimage as ndi
 from skimage.measure import regionprops
 from skimage.draw import line
 
@@ -24,22 +25,38 @@ class Ellipse:
         prop = {}
         label_map = self.map_to_array()
         regions = regionprops(label_map.astype(np.int))
+        if len(regions) < 1:
+            prop["centroid"] = [0, 0]
+            prop["orientation"] = 0
+            prop["major_axis_length"] = 1
+            prop["minor_axis_length"] = 1
+            return prop
         prop["centroid"] = regions[0].centroid
         prop["orientation"] = regions[0].orientation
         prop["major_axis_length"] = regions[0].major_axis_length
         prop["minor_axis_length"] = regions[0].minor_axis_length
         return prop
 
-    def binarize_map(self, label_map):
+    def binarize_map(self, label_map, thresh=0.1):
         if len(label_map.shape) == 3:
             label_map = np.sum(label_map, axis=2)
-        label_map[label_map > 0] = 1
+        label_map[label_map < thresh] = 0
+        label_map[label_map >= thresh] = 1
+        return label_map
+
+    def select_one_object(self, label_map):
+        label_objects, nb_labels = ndi.label(label_map)
+        sizes = np.bincount(label_objects.ravel())
+        if len(sizes) > 2:
+            mask_sizes = sizes > sorted(sizes)[-2] - 1
+            mask_sizes[0] = 0
+            return mask_sizes[label_objects]
         return label_map
 
     def fit_from_map(self, label_map):
         label_map = self.binarize_map(label_map)
-        kernel = (2, 2)
-        edg = cv2.morphologyEx(label_map, cv2.MORPH_GRADIENT, kernel)
+        label_map = self.select_one_object(label_map)
+        edg = cv2.morphologyEx(label_map.astype(np.float), cv2.MORPH_GRADIENT, (2, 2))
         idx = np.where(edg > 0)
         X = np.expand_dims(idx[1], axis=1)
         Y = np.expand_dims(idx[0], axis=1)
@@ -55,13 +72,10 @@ class Ellipse:
         y_coord = np.linspace(0, h, h)
         X_coord, Y_coord = np.meshgrid(x_coord, y_coord)
         Z_coord = self.x[0] * X_coord ** 2 + self.x[1] * X_coord * Y_coord + self.x[2] * Y_coord ** 2 + self.x[3] * X_coord + self.x[4] * Y_coord
-        if only_border:
-            eps = 0.01
-            Z_coord[abs(Z_coord - 1) > eps] = 0
-            Z_coord[abs(Z_coord - 1) <= eps] = 1
-            return Z_coord
         Z_coord[Z_coord < 1] = 0
         Z_coord[Z_coord >= 1] = 1
+        if only_border:
+            return cv2.morphologyEx(Z_coord, cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 5)))
         return Z_coord
 
     def generate_gaussian(self, array_size, cx, cy, sigma):
@@ -79,15 +93,16 @@ class Ellipse:
         centroid = self.generate_gaussian(array_size, x0, y0, self.prop["minor_axis_length"]/8)
         border = self.map_to_array(array_size, only_border=True)
 
-        max1 = np.clip(int(x0 + math.cos(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[1] - 1)
-        may1 = np.clip(int(y0 - math.sin(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[0] - 1)
-        max2 = np.clip(int(x0 - math.cos(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[1] - 1)
-        may2 = np.clip(int(y0 + math.sin(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[0] - 1)
+        max1 = np.clip(int(x0 + math.sin(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[1] - 1)
+        may1 = np.clip(int(y0 + math.cos(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[0] - 1)
+        max2 = np.clip(int(x0 - math.sin(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[1] - 1)
+        may2 = np.clip(int(y0 - math.cos(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[0] - 1)
 
-        mix1 = np.clip(int(x0 + math.sin(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[1] - 1)
-        miy1 = np.clip(int(y0 + math.cos(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[0] - 1)
-        mix2 = np.clip(int(x0 - math.sin(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[1] - 1)
-        miy2 = np.clip(int(y0 - math.cos(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[0] - 1)
+        mix1 = np.clip(int(x0 + math.cos(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[1] - 1)
+        miy1 = np.clip(int(y0 - math.sin(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[0] - 1)
+
+        mix2 = np.clip(int(x0 - math.cos(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[1] - 1)
+        miy2 = np.clip(int(y0 + math.sin(self.prop['orientation']) * 0.5 * self.prop['minor_axis_length']), 0, array_size[0] - 1)
 
         ma_min_axis = np.zeros(array_size)
         rr, cc = line(int(may1), int(max1), int(may2), int(max2))

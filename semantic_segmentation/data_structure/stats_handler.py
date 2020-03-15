@@ -3,6 +3,8 @@ class StatsHandler:
         self.s = {}
         self.r = {}
 
+        self.shape_score = {"n": 0, "s": 0}
+
         for cls in color_coding:
             self.s[cls] = {
                 "tp": 0,
@@ -12,6 +14,10 @@ class StatsHandler:
 
     def count(self, cls, t):
         self.s[cls][t] += 1
+
+    def accumulate_shape_score(self, score):
+        self.shape_score["n"] += 1
+        self.shape_score["s"] += score
 
     def eval(self):
         for cls in self.s:
@@ -24,6 +30,8 @@ class StatsHandler:
                 "f_1": f_1,
             }
 
+        self.shape_score["IoU"] = self.shape_score["s"] / self.shape_score["n"]
+
     def generate_r_string(self):
         r_string = ""
         for cls in self.r:
@@ -33,6 +41,11 @@ class StatsHandler:
             r_string += "REC: {}\n".format(self.r[cls]["rec"])
             r_string += "F_1: {}\n".format(self.r[cls]["f_1"])
             r_string += "------------------\n"
+
+        r_string += "------------------\n"
+        r_string += "Shape Score\n"
+        r_string += "IoU: {}\n".format(self.shape_score["IoU"])
+        r_string += "------------------\n"
         return r_string
 
     def show(self):

@@ -4,9 +4,10 @@ from semantic_segmentation.convolutional_neural_network.losses import dice, foca
 
 
 class LogisticsHandler:
-    def __init__(self, loss_type, num_classes=None):
+    def __init__(self, loss_type, num_classes=None, label_prep=None):
         self.loss_type = loss_type
         self.num_classes = num_classes
+        self.label_prep = label_prep
 
     def loss(self):
         if self.loss_type in ["focal", "focal_loss"]:
@@ -27,9 +28,11 @@ class LogisticsHandler:
         raise ValueError("Loss Type unknown {}".format(self.loss_type))
 
     def decode(self, y_pred, color_coding):
-        if self.loss_type in ["mean_squared_error", "mse"]:
+        if self.label_prep is None or self.label_prep == "basic":
+            return self._decode_fcn(y_pred, color_coding)
+        if self.label_prep == "ellipse":
             return self._decode_ellipse(y_pred)
-        return self._decode_fcn(y_pred, color_coding)
+        raise ValueError("Label Prep: {}, Not Known!".format(self.label_prep))
 
     def _decode_fcn(self, y_pred, color_coding):
         y_pred = y_pred[0, :, :, :]

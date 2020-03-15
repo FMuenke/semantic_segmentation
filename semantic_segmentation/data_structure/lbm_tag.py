@@ -3,7 +3,8 @@ import cv2
 import numpy as np
 
 from semantic_segmentation.data_structure.image_handler import ImageHandler
-from semantic_segmentation.data_structure.image_handler import ImageHandler
+from semantic_segmentation.preprocessing.label_preprocessor import LabelPreProcessor
+from semantic_segmentation.geometric_shapes.ellipse import Ellipse
 
 
 class LbmTag:
@@ -74,7 +75,7 @@ class LbmTag:
                             y_img[y, x, :] = self.color_coding[cls][1]
         return y_img
 
-    def load_y(self, label_size):
+    def load_y(self, label_size, label_prep=None):
         y_img = np.zeros((label_size[0], label_size[1], len(self.color_coding)))
         counter = {0: 0, 1: 0}
         if self.path_to_label_file is not None:
@@ -88,14 +89,18 @@ class LbmTag:
                                 and lbm[y, x, 2] == self.color_coding[cls][0][0]:
                             y_img[y, x, idx] = 1
                             counter[idx] += 1
+            lab_pro = LabelPreProcessor(label_prep)
+            y_img = lab_pro.apply(y_img)
         return y_img
 
     def write_result(self, res_path, color_map):
         im_id = os.path.basename(self.path_to_image_file)
         h, w = color_map.shape[:2]
         label = self.load_y_as_color_map((h, w))
+        e = Ellipse(color_map)
+        emap = 255 * e.build_label_map((h, w))
         border = 255 * np.ones((h, 10, 3))
-        r = np.concatenate([label, border, color_map], axis=1)
+        r = np.concatenate([label, border, color_map, border, emap], axis=1)
         res_file = os.path.join(res_path, im_id[:-4] + ".png")
         cv2.imwrite(res_file, r)
 
@@ -117,6 +122,11 @@ class LbmTag:
                         else:
                             if b.all():
                                 stats_handler.count(cls, "fp")
+
+    def eval_shape(self, color_map, stats_handler):
+        e = Ellipse(color_map)
+        iou = e.compare_to_map(color_map)
+        stats_handler.accumulate_shape_score(iou)
 
     def visualize_result(self, vis_path, color_map):
         im_id = os.path.basename(self.path_to_image_file)
