@@ -40,7 +40,7 @@ class ModelHandler:
             self.batch_size = cfg.opt["batch_size"]
         else:
             self.batch_size = 1
-        self.epochs = 200
+        self.epochs = 1000
 
     def predict_tag(self, tag):
         return self.predict(tag.load_data())
