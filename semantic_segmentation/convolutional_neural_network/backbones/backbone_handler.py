@@ -12,38 +12,41 @@ class BackboneHandler:
         self.num_classes = num_classes
         self.output_func = output_func
 
-    def build(self, input_layer):
+    def _build(self, input_layer, num_classes, output_func):
         if self.backbone_type in ["unet", "unet-relu"]:
-            model = UNet(self.num_classes, output_function=self.output_func)
+            model = UNet(num_classes, output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type == "unet-leaky-relu":
-            model = UNet(self.num_classes, activation="leaky_relu", output_function=self.output_func)
+            model = UNet(num_classes, activation="leaky_relu", output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type == "unet_reduced":
-            model = UNet(self.num_classes, reduced=True, output_function=self.output_func)
+            model = UNet(num_classes, reduced=True, output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type == "pspnet":
-            model = PSPNet(self.num_classes)
+            model = PSPNet(num_classes)
             return model.build(input_layer)
 
         if self.backbone_type == "segnet":
-            model = SegNet(self.num_classes, output_function=self.output_func)
+            model = SegNet(num_classes, output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type == "fr1dz":
-            model = Fr1dzNet(self.num_classes, output_function=self.output_func)
+            model = Fr1dzNet(num_classes, output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type == "basic_net":
-            model = BasicNet(self.num_classes, output_function=self.output_func)
+            model = BasicNet(num_classes, output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type == "dynamic_net":
-            model = DynamicNet(self.num_classes, output_function=self.output_func)
+            model = DynamicNet(num_classes, output_function=output_func)
             return model.build(input_layer)
 
         raise ValueError("{} Backbone was not recognised".format(self.backbone_type))
+
+    def build(self, input_layer):
+        return self._build(input_layer, self.num_classes, self.output_func)
 

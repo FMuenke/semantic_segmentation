@@ -95,6 +95,7 @@ class Ellipse:
 
         max1 = np.clip(int(x0 + math.sin(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[1] - 1)
         may1 = np.clip(int(y0 + math.cos(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[0] - 1)
+        
         max2 = np.clip(int(x0 - math.sin(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[1] - 1)
         may2 = np.clip(int(y0 - math.cos(self.prop['orientation']) * 0.5 * self.prop['major_axis_length']), 0, array_size[0] - 1)
 

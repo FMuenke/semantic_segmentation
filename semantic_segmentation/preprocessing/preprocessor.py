@@ -34,7 +34,7 @@ class Preprocessor:
         return mat_norm
 
     def rescale(self, data, max_width, max_height, is_lbm=False):
-        height, width, ch = data.shape
+        height, width = data.shape[0], data.shape[1]
         if height >= max_height:
             new_height = max_height
             new_width = int(width * new_height / height)
@@ -42,7 +42,7 @@ class Preprocessor:
                 data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_NEAREST)
             else:
                 data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_CUBIC)
-        height, width, ch = data.shape
+        height, width = data.shape[0], data.shape[1]
         if width >= max_width:
             new_width = max_width
             new_height = int(height * new_width / width)
@@ -50,7 +50,8 @@ class Preprocessor:
                 data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_NEAREST)
             else:
                 data = cv2.resize(data, (int(new_width), int(new_height)), interpolation=cv2.INTER_CUBIC)
-        return data
+        height, width = data.shape[0], data.shape[1]
+        return np.reshape(data, (height, width, -1))
 
     def pad(self, image):
         img_h = ImageHandler(image)

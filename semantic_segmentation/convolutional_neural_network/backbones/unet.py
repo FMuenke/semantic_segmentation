@@ -84,10 +84,13 @@ class UNet:
         conv8 = self.dec_unit(conv7, conv2, 128, stage=8)
         conv9 = self.dec_unit(conv8, conv1, 64, stage=9)
 
-        out = Convolution2D(self.num_classes,
-                            3,
-                            activation=self.out_f,
-                            padding='same',
-                            kernel_initializer='uniform',
-                            name="unet_classification_layer")(conv9)
+        if self.out_f is not None:
+            out = Convolution2D(self.num_classes,
+                                3,
+                                activation=self.out_f,
+                                padding='same',
+                                kernel_initializer='uniform',
+                                name="unet_classification_layer")(conv9)
+        else:
+            out = conv9
         return out

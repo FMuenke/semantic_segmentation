@@ -33,6 +33,11 @@ class ModelHandler:
             self.label_prep = cfg.opt["label_prep"]
         else:
             self.label_prep = "basic"
+
+        if "logistic" in cfg.opt:
+            self.logistic = cfg.opt["logistic"]
+        else:
+            self.logistic = "sigmoid"
         self.model = None
 
         self.optimizer = optimizers.adam(lr=cfg.opt["init_learning_rate"])
@@ -64,14 +69,8 @@ class ModelHandler:
                                          self.input_shape[1],
                                          self.input_shape[2],
                                          ))
-        if self.loss_type == "mean_squared_error":
-            output_func = "linear"
-        else:
-            output_func = "sigmoid"
         num_classes = len(self.color_coding)
-        if self.label_prep == "ellipse":
-            num_classes = 3
-        backbone_h = BackboneHandler(self.backbone, num_classes, output_func)
+        backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic)
         x = backbone_h.build(input_layer)
         logistics_h = LogisticsHandler(loss_type=self.loss_type, num_classes=len(self.color_coding))
 
