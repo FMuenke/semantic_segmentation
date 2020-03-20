@@ -14,14 +14,18 @@ class LabelPreProcessor:
 
     def _apply_for_ellipse(self, label_map):
         e = Ellipse(label_map)
-        label_map = e.build_label_map([label_map.shape[0], label_map.shape[1]])
-        return label_map
+        param = [e.prop["centroid"][0],
+                 e.prop["centroid"][1],
+                 e.prop["orientation"],
+                 e.prop["major_axis_length"],
+                 e.prop["minor_axis_length"]]
+        return [label_map, np.array(param)]
 
     def apply(self, label_map):
         h, w = label_map.shape[:2]
         if self.label_prep == "fuzzy":
             return self._apply_gauss(label_map)
         if self.label_prep == "ellipse":
-            label_map = self._apply_for_ellipse(label_map)
+            return self._apply_for_ellipse(label_map)
             # label_map = np.reshape(label_map, (h, w, 1))
-        return label_map
+        return label_map, None

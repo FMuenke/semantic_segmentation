@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 
 from semantic_segmentation.preprocessing.preprocessor import Preprocessor
-from semantic_segmentation.preprocessing.label_preprocessor import LabelPreProcessor
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -73,22 +72,29 @@ class DataGenerator(keras.utils.Sequence):
         Generates data containing the batch_size samples.
         """
         x = []
-        y = []
-
+        y1 = []
+        y2 = []
+        only_one = True
         for i, tag in enumerate(tags_temp):
             img = tag.load_x()
-            lab = tag.load_y((img.shape[0], img.shape[1]), label_prep=self.label_prep)
+            lab1, lab2 = tag.load_y((img.shape[0], img.shape[1]), label_prep=self.label_prep)
+            if lab2 is not None:
+                only_one = False
 
             if self.augmentor is not None:
-                img, lab = self.augmentor.apply(img, lab)
+                img, lab1 = self.augmentor.apply(img, lab1)
 
             preprocessor = Preprocessor(image_size=self.image_size, padding=self.padding)
             img = preprocessor.apply(img)
-            lab = preprocessor.apply_to_label_map(lab)
+            lab1 = preprocessor.apply_to_label_map(lab1)
             x.append(img)
-            y.append(lab)
+            y1.append(lab1)
+            y2.append(lab2)
 
         x = np.array(x)
-        y = np.array(y)
+        if not only_one:
+            y = [np.array(y1), np.array(y2)]
+        else:
+            y = np.array(y1)
 
         return x, y

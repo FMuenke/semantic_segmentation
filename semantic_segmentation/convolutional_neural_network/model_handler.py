@@ -52,7 +52,7 @@ class ModelHandler:
 
     def predict(self, data):
         y_pred = self.inference(data)
-        logistics_h = LogisticsHandler(loss_type=None, num_classes=len(self.color_coding), label_prep=self.label_prep)
+        logistics_h = LogisticsHandler(num_classes=len(self.color_coding), label_prep=self.label_prep)
         return logistics_h.decode(y_pred, self.color_coding)
 
     def inference(self, data):
@@ -70,16 +70,15 @@ class ModelHandler:
                                          self.input_shape[2],
                                          ))
         num_classes = len(self.color_coding)
-        backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic)
+        backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic, loss_type=self.loss_type)
         x = backbone_h.build(input_layer)
-        logistics_h = LogisticsHandler(loss_type=self.loss_type, num_classes=len(self.color_coding))
 
         self.model = Model(inputs=input_layer, outputs=x)
 
         self.load()
 
         if compile_model:
-            self.model.compile(loss=logistics_h.loss(), optimizer=self.optimizer, metrics=["accuracy"])
+            self.model.compile(loss=backbone_h.loss(), optimizer=self.optimizer, metrics=backbone_h.metric())
 
     def load(self):
         model_path = None
@@ -122,8 +121,8 @@ class ModelHandler:
         )
 
         checkpoint = ModelCheckpoint(
-            os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{val_acc:.4f}.hdf5"),
-            monitor="val_acc",
+            os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{dense_1_mean_absolute_error:.4f}.hdf5"),
+            monitor="dense_1_mean_absolute_error",
             verbose=1,
             save_best_only=True,
             mode="max",
@@ -132,8 +131,6 @@ class ModelHandler:
         reduce_lr = ReduceLROnPlateau(factor=0.5)
 
         callback_list = [checkpoint, reduce_lr]
-
-
 
         self.model.fit_generator(
             generator=training_generator,

@@ -1,31 +1,11 @@
 import numpy as np
 from semantic_segmentation.data_structure.image_handler import ImageHandler
-from semantic_segmentation.convolutional_neural_network.losses import dice, focal_loss, jaccard, weighted_cross_entropy, mixed
 
 
 class LogisticsHandler:
-    def __init__(self, loss_type, num_classes=None, label_prep=None):
-        self.loss_type = loss_type
+    def __init__(self, num_classes=None, label_prep=None):
         self.num_classes = num_classes
         self.label_prep = label_prep
-
-    def loss(self):
-        if self.loss_type in ["focal", "focal_loss"]:
-            return focal_loss()
-        if self.loss_type in ["binary_crossentropy", "bc"]:
-            return "binary_crossentropy"
-        if self.loss_type == "dice":
-            return dice()
-        if self.loss_type == "jaccard":
-            return jaccard()
-        if self.loss_type == "weighted_cross_entropy":
-            return weighted_cross_entropy(100)
-        if self.loss_type == "mixed":
-            return mixed()
-        if self.loss_type in ["mean_squared_error", "mse"]:
-            return "mean_squared_error"
-
-        raise ValueError("Loss Type unknown {}".format(self.loss_type))
 
     def decode(self, y_pred, color_coding):
         if self.label_prep is None or self.label_prep == "basic":
