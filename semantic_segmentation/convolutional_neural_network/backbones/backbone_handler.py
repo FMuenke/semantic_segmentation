@@ -1,4 +1,4 @@
-from keras.layers import Dense, Convolution2D, Flatten, AveragePooling2D, Concatenate, Reshape
+from keras.layers import Dense, Convolution2D, Flatten, AveragePooling2D, Concatenate, Reshape, Add, Activation
 
 from semantic_segmentation.convolutional_neural_network.backbones.unet import UNet
 from semantic_segmentation.convolutional_neural_network.backbones.pspnet import PSPNet
@@ -90,6 +90,13 @@ class BackboneHandler:
         e = Dense(5)(e)
 
         return [x, e]
+
+    def build_shape_refinement(self, input_layer):
+        x = self._build(input_layer, self.num_classes, "sigmoid")
+        s_hor = Convolution2D(self.num_classes, (1, 20))(x)
+        s_ver = Convolution2D(self.num_classes, (20, 1))(x)
+        s = Add()([s_hor, s_ver])
+        s = Activation()
 
     def build(self, input_layer):
         if self.output_func == "ellipse":
