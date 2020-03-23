@@ -120,18 +120,22 @@ class ModelHandler:
             label_prep=self.label_prep
         )
 
-        to_monitor = "acc"
-        save_name = "weights-improvement-{epoch:02d}-{acc:.4f}.hdf5"
         if self.logistic == "ellipse":
-            to_monitor = "dense_1_mean_absolute_error"
-            save_name = "weights-improvement-{epoch:02d}-{dense_1_mean_absolute_error:.4f}.hdf5"
-        checkpoint = ModelCheckpoint(
-            os.path.join(self.model_folder, save_name),
-            monitor=to_monitor,
-            verbose=1,
-            save_best_only=True,
-            mode="max",
-        )
+            checkpoint = ModelCheckpoint(
+                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{dense_1_mean_absolute_error:.4f}.hdf5"),
+                monitor="dense_1_mean_absolute_error",
+                verbose=1,
+                save_best_only=True,
+                mode="min",
+            )
+        else:
+            checkpoint = ModelCheckpoint(
+                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{acc:.4f}.hdf5"),
+                monitor="acc",
+                verbose=1,
+                save_best_only=True,
+                mode="max",
+            )
 
         reduce_lr = ReduceLROnPlateau(factor=0.5)
 

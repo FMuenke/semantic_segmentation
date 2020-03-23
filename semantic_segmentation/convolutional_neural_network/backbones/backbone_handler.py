@@ -92,14 +92,19 @@ class BackboneHandler:
         return [x, e]
 
     def build_shape_refinement(self, input_layer):
+        r = 21
         x = self._build(input_layer, self.num_classes, "sigmoid")
-        s_hor = Convolution2D(self.num_classes, (1, 20))(x)
-        s_ver = Convolution2D(self.num_classes, (20, 1))(x)
+        s_hor = Convolution2D(self.num_classes, (1, r))(x)
+        s_ver = Convolution2D(self.num_classes, (r, 1))(x)
         s = Add()([s_hor, s_ver])
-        s = Activation()
+        s = Activation("sigmoid")(s)
+        return s
 
     def build(self, input_layer):
         if self.output_func == "ellipse":
+            return self.build_ellipse_net(input_layer)
+
+        if self.output_func == "shape_refinement":
             return self.build_ellipse_net(input_layer)
 
         return self._build(input_layer, self.num_classes, self.output_func)
