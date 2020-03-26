@@ -89,8 +89,8 @@ class LbmTag:
                                 and lbm[y, x, 2] == self.color_coding[cls][0][0]:
                             y_img[y, x, idx] = 1
                             counter[idx] += 1
-            lab_pro = LabelPreProcessor(label_prep)
-            y_img = lab_pro.apply(y_img)
+        lab_pro = LabelPreProcessor(label_prep)
+        y_img = lab_pro.apply(y_img)
         return y_img
 
     def write_result(self, res_path, color_map):
@@ -103,6 +103,11 @@ class LbmTag:
         r = np.concatenate([label, border, color_map, border, emap], axis=1)
         res_file = os.path.join(res_path, im_id[:-4] + ".png")
         cv2.imwrite(res_file, r)
+
+    def write_inference(self, res_path, color_map):
+        im_id = os.path.basename(self.path_to_image_file)
+        res_file = os.path.join(res_path, im_id[:-4] + ".png")
+        cv2.imwrite(res_file, color_map)
 
     def eval(self, color_map, stats_handler):
         height, width = color_map.shape[:2]
