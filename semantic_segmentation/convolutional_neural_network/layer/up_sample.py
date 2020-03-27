@@ -1,4 +1,4 @@
-from keras.layers import Layer
+from tensorflow.keras.layers import Layer
 import tensorflow as tf
 
 
@@ -12,7 +12,7 @@ class UpSample(Layer):
         x_in, target = x
         #batch_size, height, width, nb_features = target.get_shape().as_list()
         #size = tf.constant((height, width), dtype=tf.int32)
-        return tf.image.resize_nearest_neighbor(x_in, tf.shape(target)[1:3])
+        return tf.image.resize(x_in, tf.shape(target)[1:3], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0][0],) + input_shape[1][1:3] + (input_shape[0][-1],)

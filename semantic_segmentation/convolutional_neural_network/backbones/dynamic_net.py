@@ -1,4 +1,4 @@
-from keras.layers import Convolution2D, BatchNormalization, Activation, MaxPooling2D, UpSampling2D, Input
+from tensorflow.keras.layers import Convolution2D, BatchNormalization, Activation, MaxPooling2D, UpSampling2D, Input
 from semantic_segmentation.convolutional_neural_network.layer.up_sample import UpSample
 
 

@@ -1,8 +1,6 @@
-from keras.layers import (
+from tensorflow.keras.layers import (
     Activation,
     Convolution2D,
-    MaxPooling2D,
-    Add,
 )
 
 from semantic_segmentation.convolutional_neural_network.layer.feature_pyramide import feature_pyramid

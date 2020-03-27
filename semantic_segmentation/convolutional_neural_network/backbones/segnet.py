@@ -1,13 +1,11 @@
-from keras.layers import (
+from tensorflow.keras.layers import (
     Activation,
     BatchNormalization,
     Convolution2D,
-    MaxPooling2D,
     ReLU,
     LeakyReLU,
 )
 
-from semantic_segmentation.convolutional_neural_network.layer.up_sample import UpSample
 from semantic_segmentation.convolutional_neural_network.layer.pool_and_unpool import MaxPoolingWithArgmax2D, MaxUnpooling2D
 
 

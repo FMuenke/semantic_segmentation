@@ -1,5 +1,5 @@
-from keras.engine.topology import Layer
-import keras.backend as K
+from tensorflow.keras.layers import Layer
+import tensorflow.keras.backend as K
 
 
 class GlobalSumLayer(Layer):

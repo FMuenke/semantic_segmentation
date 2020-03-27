@@ -1,5 +1,4 @@
-import keras
-import cv2
+from tensorflow import keras
 import numpy as np
 
 from semantic_segmentation.preprocessing.preprocessor import Preprocessor

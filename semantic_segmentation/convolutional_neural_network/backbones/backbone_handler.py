@@ -1,4 +1,4 @@
-from keras.layers import Dense, Convolution2D, Flatten, AveragePooling2D, Concatenate, Reshape, Add, Activation
+from tensorflow.keras.layers import Dense, Convolution2D, Flatten, AveragePooling2D, Concatenate, Reshape, Add, Activation
 
 from semantic_segmentation.convolutional_neural_network.backbones.unet import UNet
 from semantic_segmentation.convolutional_neural_network.backbones.pspnet import PSPNet

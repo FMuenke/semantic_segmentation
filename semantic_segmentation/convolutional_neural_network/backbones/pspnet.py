@@ -1,17 +1,18 @@
-import keras.backend as K
-from keras.engine import InputSpec
-from keras.utils import conv_utils
-from keras.engine.topology import Layer
-from keras.layers import Reshape, Permute, Dense, Activation, Conv2D
-from keras.layers import MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
-from keras.layers import ZeroPadding2D, Lambda, Conv2DTranspose
-from keras.layers import merge, multiply, add, concatenate, BatchNormalization
+import tensorflow.keras.backend as K
+import tensorflow as tf
+from tensorflow.keras.layers import InputSpec
+from tensorflow.keras.layers import Layer
+from tensorflow.keras.utils import normalize
+from tensorflow.keras.layers import Reshape, Permute, Dense, Activation, Conv2D, Concatenate
+from tensorflow.keras.layers import MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
+from tensorflow.keras.layers import ZeroPadding2D, Lambda, Conv2DTranspose
+from tensorflow.keras.layers import multiply, add, concatenate, BatchNormalization
 
 
 class CroppingLike2D(Layer):
     def __init__(self, target_shape, offset=None, data_format=None, **kwargs):
         super(CroppingLike2D, self).__init__(**kwargs)
-        self.data_format = conv_utils.normalize_data_format(data_format)
+        self.data_format = normalize(data_format)
         self.target_shape = target_shape
         if offset is None or offset == 'centered':
             self.offset = 'centered'
@@ -278,15 +279,14 @@ def aspp_block(
             name='bn_1_1_%s' % output_stride)(conv1_1)
 
     # channel merge
-    y = merge([
+    y = concatenate([
         conv3_3_1,
         conv3_3_2,
         conv3_3_3,
         conv1_1,
         ],
         # global_feat,
-        mode='concat',
-        concat_axis=3)
+        axis=3)
 
     # y = _conv_bn_relu(filters=1, kernel_size=(1, 1),padding='same')(y)
     y = _conv(
@@ -398,9 +398,8 @@ def duc(x, factor=8, output_shape=(512, 512, 1)):
 
 def Interp(x, shape):
     ''' interpolation '''
-    from keras.backend import tf as ktf
     new_height, new_width = shape
-    resized = ktf.image.resize_images(
+    resized = tf.image.resize_images(
             x,
             [int(new_height), int(new_width)],
             align_corners=True)

@@ -1,11 +1,11 @@
 import os
 import numpy as np
-import cv2
-from keras.layers import Input
-from keras import optimizers
+import tensorflow as tf
+from tensorflow.keras.layers import Input
+from tensorflow.keras import optimizers
 
-from keras.models import Model
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.models import Model
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 
 from semantic_segmentation.convolutional_neural_network.backbones.backbone_handler import BackboneHandler
@@ -14,6 +14,9 @@ from semantic_segmentation.convolutional_neural_network.data_generator import Da
 
 from semantic_segmentation.preprocessing.augmentor import Augmentor
 from semantic_segmentation.preprocessing.preprocessor import Preprocessor
+
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
 class ModelHandler:
@@ -40,7 +43,7 @@ class ModelHandler:
             self.logistic = "sigmoid"
         self.model = None
 
-        self.optimizer = optimizers.adam(lr=cfg.opt["init_learning_rate"])
+        self.optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
         if "batch_size" in cfg.opt:
             self.batch_size = cfg.opt["batch_size"]
         else:
@@ -59,7 +62,7 @@ class ModelHandler:
         preprocessor = Preprocessor(self.input_shape, padding=self.padding)
         img = preprocessor.apply(data)
         img = np.expand_dims(img, axis=0)
-        res = self.model.predict(img)
+        res = self.model.predict_on_batch(img)
         res = preprocessor.un_apply(res)
         return res
 
@@ -130,19 +133,20 @@ class ModelHandler:
             )
         else:
             checkpoint = ModelCheckpoint(
-                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{acc:.4f}.hdf5"),
-                monitor="acc",
+                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{accuracy:.4f}.hdf5"),
+                monitor="accuracy",
                 verbose=1,
                 save_best_only=True,
                 mode="max",
+                save_freq=200
             )
 
         reduce_lr = ReduceLROnPlateau(factor=0.5)
 
-        callback_list = [checkpoint, reduce_lr]
+        callback_list = [checkpoint]
 
-        self.model.fit_generator(
-            generator=training_generator,
+        self.model.fit(
+            x=training_generator,
             validation_data=validation_generator,
             callbacks=callback_list,
             epochs=self.epochs,
