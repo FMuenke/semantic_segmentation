@@ -133,12 +133,13 @@ class ModelHandler:
             )
         else:
             checkpoint = ModelCheckpoint(
-                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{accuracy:.4f}.hdf5"),
-                monitor="accuracy",
+                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{val_accuracy:.4f}.hdf5"),
+                monitor="val_accuracy",
                 verbose=1,
                 save_best_only=True,
                 mode="max",
-                save_freq=200
+                save_freq="epoch",
+                period=2,
             )
 
         reduce_lr = ReduceLROnPlateau(factor=0.5)

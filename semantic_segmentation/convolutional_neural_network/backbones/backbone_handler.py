@@ -19,7 +19,7 @@ class BackboneHandler:
 
     def loss(self):
         if self.output_func == "ellipse":
-            return ["binary_crossentropy", "mae"]
+            return [["binary_crossentropy"], ["mae"]]
 
         if self.loss_type in ["focal", "focal_loss"]:
             return focal_loss()
@@ -40,7 +40,10 @@ class BackboneHandler:
 
     def metric(self):
         if self.output_func == "ellipse":
-            return ["accuracy", "mae"]
+            return [["accuracy"], ["mae"]]
+
+        if self.output_func == "shape_refinement":
+            return [["accuracy"], ["accuracy"]]
 
         return ["accuracy"]
 
@@ -98,7 +101,7 @@ class BackboneHandler:
         s_ver = Convolution2D(self.num_classes, (r, 1))(x)
         s = Add()([s_hor, s_ver])
         s = Activation("sigmoid")(s)
-        return s
+        return x, s
 
     def build(self, input_layer):
         if self.output_func == "ellipse":

@@ -18,7 +18,7 @@ class Config:
         }
 
         self.opt = {
-            "backbone": "dynamic_net",
+            "backbone": "unet",
             "logistic": "sigmoid",
             "loss": "bc",
             "label_prep": "basic",
