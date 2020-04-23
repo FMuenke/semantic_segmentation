@@ -19,7 +19,7 @@ class BackboneHandler:
 
     def loss(self):
         if self.output_func == "ellipse":
-            return [["binary_crossentropy"], ["mae"]]
+            return ["binary_crossentropy", "mae"]
 
         if self.loss_type in ["focal", "focal_loss"]:
             return focal_loss()
@@ -90,7 +90,7 @@ class BackboneHandler:
         e = Convolution2D(16, (4, 4), strides=(2, 2), activation="relu")(e)
         e = AveragePooling2D((2, 2))(e)
         e = Flatten()(e)
-        e = Dense(5)(e)
+        e = Dense(5, kernel_initializer="zero")(e)
 
         return [x, e]
 

@@ -14,11 +14,13 @@ class LabelPreProcessor:
 
     def _apply_for_ellipse(self, label_map):
         e = Ellipse(label_map)
-        param = [e.prop["centroid"][0],
-                 e.prop["centroid"][1],
+        height, width = label_map.shape[:2]
+        diag = np.sqrt(height**2 + width**2)
+        param = [e.prop["centroid"][0] / height,
+                 e.prop["centroid"][1] / width,
                  e.prop["orientation"],
-                 e.prop["major_axis_length"],
-                 e.prop["minor_axis_length"]]
+                 e.prop["major_axis_length"] / diag,
+                 e.prop["minor_axis_length"] / diag]
         return [label_map, np.array(param)]
 
     def apply(self, label_map):

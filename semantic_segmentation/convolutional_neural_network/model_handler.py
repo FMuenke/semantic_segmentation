@@ -125,8 +125,8 @@ class ModelHandler:
 
         if self.logistic == "ellipse":
             checkpoint = ModelCheckpoint(
-                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{dense_1_mean_absolute_error:.4f}.hdf5"),
-                monitor="dense_1_mean_absolute_error",
+                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{val_dense_mae:.4f}.hdf5"),
+                monitor="val_dense_mae",
                 verbose=1,
                 save_best_only=True,
                 mode="min",
@@ -138,13 +138,11 @@ class ModelHandler:
                 verbose=1,
                 save_best_only=True,
                 mode="max",
-                save_freq="epoch",
-                period=2,
             )
 
         reduce_lr = ReduceLROnPlateau(factor=0.5)
 
-        callback_list = [checkpoint]
+        callback_list = [checkpoint, reduce_lr]
 
         self.model.fit(
             x=training_generator,
