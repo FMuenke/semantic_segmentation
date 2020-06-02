@@ -58,6 +58,5 @@ class SegNet:
         un_pool4 = self.dec_unit(un_pool3, mask2, [128, 64], "dec_4")
         un_pool5 = self.dec_unit(un_pool4, mask1, [64], "dec_5")
 
-        out = Convolution2D(self.num_classes, (1, 1), padding="valid", name="segnet_classification_conv")(un_pool5)
-        out = Activation(self.out_f, name="segnet_classification")(out)
+        out = Convolution2D(self.num_classes, (1, 1), padding="valid", name="segnet_classification_conv", activation=self.out_f)(un_pool5)
         return out

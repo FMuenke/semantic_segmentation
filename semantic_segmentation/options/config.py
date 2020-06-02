@@ -7,6 +7,7 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
+            # "js": [[1, 1, 1], [155, 155, 0]]
             # "man_hole": [[1, 1, 1], [0, 255, 0]],
             # "crack": [[3, 3, 3], [255, 255, 0]],
             # "heart": [[4, 4, 4], [0, 255, 0]],

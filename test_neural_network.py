@@ -33,7 +33,6 @@ def main(args_):
         color_map = model_handler.predict(t_set[tid].load_x())
         t_set[tid].write_result(res_fol.path(), color_map)
         t_set[tid].eval(color_map, sh)
-        t_set[tid].eval_shape(color_map, sh)
         t_set[tid].visualize_result(vis_fol.path(), color_map)
 
     sh.eval()

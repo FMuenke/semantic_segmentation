@@ -1,5 +1,6 @@
 import argparse
 import os
+from time import time
 
 from tqdm import tqdm
 

@@ -97,10 +97,8 @@ class LbmTag:
         im_id = os.path.basename(self.path_to_image_file)
         h, w = color_map.shape[:2]
         label = self.load_y_as_color_map((h, w))
-        e = Ellipse(color_map)
-        emap = 255 * e.build_label_map((h, w))
         border = 255 * np.ones((h, 10, 3))
-        r = np.concatenate([label, border, color_map, border, emap], axis=1)
+        r = np.concatenate([label, border, color_map], axis=1)
         res_file = os.path.join(res_path, im_id[:-4] + ".png")
         cv2.imwrite(res_file, r)
 
@@ -127,11 +125,6 @@ class LbmTag:
                         else:
                             if b.all():
                                 stats_handler.count(cls, "fp")
-
-    def eval_shape(self, color_map, stats_handler):
-        e = Ellipse(color_map)
-        iou = e.compare_to_map(color_map)
-        stats_handler.accumulate_shape_score(iou)
 
     def visualize_result(self, vis_path, color_map):
         im_id = os.path.basename(self.path_to_image_file)
