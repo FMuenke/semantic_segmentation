@@ -7,23 +7,24 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
+            "js": [[1, 1, 1], [155, 155, 0]]
             # "man_hole": [[1, 1, 1], [0, 255, 0]],
             # "crack": [[3, 3, 3], [255, 255, 0]],
             # "heart": [[4, 4, 4], [0, 255, 0]],
             # "muscle": [[255, 255, 255], [255, 0, 0]],
-            "heart": [[4, 4, 4], [0, 255, 0]],
+            # "heart": [[4, 4, 4], [0, 255, 0]],
             # "muscle": [[255, 255, 255], [255, 0, 0]],
             # "shadow": [[1, 1, 1], [255, 0, 0]],
             # "filled_crack": [[2, 2, 2], [0, 255, 0]],
         }
 
         self.opt = {
-            "backbone": "unet",
-            "logistic": "ellipse",
+            "backbone": "segnet",
+            "logistic": "sigmoid",
             "loss": "bc",
-            "label_prep": "ellipse",
-            "input_shape": [128, 128, 3],
-            "batch_size": 2,
+            "label_prep": "basic",
+            "input_shape": [256, 256, 3],
+            "batch_size": 1,
             "init_learning_rate": 1e-4,
             "use_augmentation": True,
             "padding": True,

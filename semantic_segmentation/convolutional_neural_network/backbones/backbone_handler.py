@@ -56,7 +56,7 @@ class BackboneHandler:
             model = UNet(num_classes, activation="leaky_relu", output_function=output_func)
             return model.build(input_layer)
 
-        if self.backbone_type == "unet_reduced":
+        if self.backbone_type in ["unet_reduced", "unet_small"]:
             model = UNet(num_classes, reduced=True, output_function=output_func)
             return model.build(input_layer)
 

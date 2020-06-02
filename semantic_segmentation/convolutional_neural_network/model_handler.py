@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras import optimizers
-
+from time import time
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
@@ -15,8 +15,12 @@ from semantic_segmentation.convolutional_neural_network.data_generator import Da
 from semantic_segmentation.preprocessing.augmentor import Augmentor
 from semantic_segmentation.preprocessing.preprocessor import Preprocessor
 
-physical_devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
+try:
+    physical_devices = tf.config.experimental.list_physical_devices('GPU')
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except Exception as e:
+    print(e)
+    print("ATTENTION: GPU IS NOT USED....")
 
 
 class ModelHandler:
@@ -56,7 +60,8 @@ class ModelHandler:
     def predict(self, data):
         y_pred = self.inference(data)
         logistics_h = LogisticsHandler(num_classes=len(self.color_coding), label_prep=self.label_prep)
-        return logistics_h.decode(y_pred, self.color_coding)
+        result = logistics_h.decode(y_pred, self.color_coding)
+        return result
 
     def inference(self, data):
         preprocessor = Preprocessor(self.input_shape, padding=self.padding)
