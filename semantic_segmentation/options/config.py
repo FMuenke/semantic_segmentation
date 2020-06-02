@@ -11,22 +11,23 @@ class Config:
             # "crack": [[3, 3, 3], [255, 255, 0]],
             # "heart": [[4, 4, 4], [0, 255, 0]],
             # "muscle": [[255, 255, 255], [255, 0, 0]],
-            "heart": [[4, 4, 4], [0, 255, 0]],
+            # "heart": [[4, 4, 4], [0, 255, 0]],
             # "muscle": [[255, 255, 255], [255, 0, 0]],
             # "shadow": [[1, 1, 1], [255, 0, 0]],
             # "filled_crack": [[2, 2, 2], [0, 255, 0]],
+            "patch": [[155, 155, 155], [0, 255, 0]],
         }
 
         self.opt = {
-            "backbone": "unet",
-            "logistic": "ellipse",
+            "backbone": "segnet",
+            "logistic": "sigmoid",
             "loss": "bc",
-            "label_prep": "ellipse",
-            "input_shape": [128, 128, 3],
-            "batch_size": 2,
+            "label_prep": "basic",
+            "input_shape": [128, 512, 3],
+            "batch_size": 8,
             "init_learning_rate": 1e-4,
             "use_augmentation": True,
-            "padding": True,
+            "padding": False,
         }
 
         self.randomized_split = False
