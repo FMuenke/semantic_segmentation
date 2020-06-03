@@ -68,7 +68,7 @@ class Preprocessor:
                 image = img_h.resize(height=new_height, width=new_width)
         ih, iw = image.shape[:2]
         ph, pw = self.image_size[0], self.image_size[1]
-        x = np.mean(image) * np.ones((ph, pw, ch))
+        x = np.zeros((ph, pw, ch))
         sy1 = int(ph/2)-int(ih/2)
         sx1 = int(pw/2)-int(iw/2)
         if ch == 1:
