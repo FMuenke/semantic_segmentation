@@ -154,8 +154,8 @@ class ModelHandler:
             validation_data=validation_generator,
             callbacks=callback_list,
             epochs=self.epochs,
-            steps_per_epoch=train_steps,
-            validation_steps=val_steps,
+            steps_per_epoch=int(train_steps / 2),
+            validation_steps=int(val_steps / 2),
         )
 
 
