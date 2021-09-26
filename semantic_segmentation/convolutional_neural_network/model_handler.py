@@ -3,12 +3,11 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras import optimizers
-from time import time
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 
 
-from semantic_segmentation.convolutional_neural_network.backbones.backbone_handler import BackboneHandler
+from semantic_segmentation.convolutional_neural_network.backbone_handler import BackboneHandler
 from semantic_segmentation.convolutional_neural_network.logistics_handler import LogisticsHandler
 from semantic_segmentation.convolutional_neural_network.data_generator import DataGenerator
 
@@ -108,8 +107,6 @@ class ModelHandler:
             print("Only Batch Size of 1 is possible.")
             self.batch_size = 1
 
-        train_steps = int(len(tag_set_train) / self.batch_size)
-        val_steps = int(len(tag_set_test) / self.batch_size)
         training_generator = DataGenerator(
             tag_set_train,
             image_size=self.input_shape,
@@ -128,34 +125,24 @@ class ModelHandler:
             label_prep=self.label_prep
         )
 
-        if self.logistic == "ellipse":
-            checkpoint = ModelCheckpoint(
-                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{val_dense_mae:.4f}.hdf5"),
-                monitor="val_dense_mae",
-                verbose=1,
-                save_best_only=True,
-                mode="min",
-            )
-        else:
-            checkpoint = ModelCheckpoint(
-                os.path.join(self.model_folder, "weights-improvement-{epoch:02d}-{val_accuracy:.4f}.hdf5"),
-                monitor="val_accuracy",
-                verbose=1,
-                save_best_only=True,
-                mode="max",
-            )
+        checkpoint = ModelCheckpoint(
+            os.path.join(self.model_folder, "weights-final.hdf5"),
+            monitor="val_accuracy",
+            verbose=1,
+            save_best_only=True,
+            mode="max",
+        )
 
-        reduce_lr = ReduceLROnPlateau(factor=0.5)
+        reduce_lr = ReduceLROnPlateau(factor=0.5, verbose=1)
+        early_stop = EarlyStopping(monitor="val_accuracy", patience=20, verbose=1, min_delta=0.005)
 
-        callback_list = [checkpoint, reduce_lr]
+        callback_list = [checkpoint, reduce_lr, early_stop]
 
         self.model.fit(
             x=training_generator,
             validation_data=validation_generator,
             callbacks=callback_list,
             epochs=self.epochs,
-            steps_per_epoch=int(train_steps / 2),
-            validation_steps=int(val_steps / 2),
         )
 
 

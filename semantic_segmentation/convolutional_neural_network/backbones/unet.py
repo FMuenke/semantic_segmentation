@@ -14,7 +14,7 @@ from semantic_segmentation.convolutional_neural_network.layer.up_sample import U
 class UNet:
     def __init__(self, num_classes,
                  output_function="sigmoid",
-                 dyn_up_sampling=True,
+                 dyn_up_sampling=False,
                  batch_norm=True,
                  reduced=False,
                  activation="relu"):
@@ -68,17 +68,14 @@ class UNet:
         return conv
 
     def build(self, input_tensor):
-
+        pool0 = Convolution2D(8, (7, 7), padding="same")(input_tensor)
         pool1, conv1 = self.enc_unit(input_tensor, 64, stage=1)
         pool2, conv2 = self.enc_unit(pool1, 128, stage=2)
         pool3, conv3 = self.enc_unit(pool2, 256, stage=3)
         pool4, conv4 = self.enc_unit(pool3, 512, stage=4)
 
-        if not self.reduced:
-            pool5, conv5 = self.enc_unit(pool4, 1024, stage=5)
-            conv6 = self.dec_unit(conv5, conv4, 512, stage=6)
-        else:
-            conv6 = conv4
+        pool5, conv5 = self.enc_unit(pool4, 1024, stage=5)
+        conv6 = self.dec_unit(conv5, conv4, 512, stage=6)
 
         conv7 = self.dec_unit(conv6, conv3, 256, stage=7)
         conv8 = self.dec_unit(conv7, conv2, 128, stage=8)

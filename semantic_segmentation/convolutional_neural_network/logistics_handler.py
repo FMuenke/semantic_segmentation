@@ -1,6 +1,4 @@
 import numpy as np
-from time import time
-from semantic_segmentation.data_structure.image_handler import ImageHandler
 
 
 class LogisticsHandler:

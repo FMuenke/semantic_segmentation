@@ -7,28 +7,25 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            "js": [[1, 1, 1], [155, 155, 0]]
-            # "man_hole": [[1, 1, 1], [0, 255, 0]],
-            # "crack": [[3, 3, 3], [255, 255, 0]],
-            # "heart": [[4, 4, 4], [0, 255, 0]],
-            # "muscle": [[255, 255, 255], [255, 0, 0]],
-            # "heart": [[4, 4, 4], [0, 255, 0]],
-            # "muscle": [[255, 255, 255], [255, 0, 0]],
-            # "shadow": [[1, 1, 1], [255, 0, 0]],
-            # "filled_crack": [[2, 2, 2], [0, 255, 0]],
-            # "patch": [[155, 155, 155], [0, 255, 0]],
+            # "asphalt": [[1, 1, 1], [255, 0, 0]],
+            # "marking": [[2, 2, 2], [0, 255, 0]],
+            # "nature": [[3, 3, 3], [0, 0, 255]],
+            # "stones": [[4, 4, 4], [0, 255, 255]],
+            # "earth": [[5, 5, 5], [0, 255, 255]],
+            # "drains": [[7, 7, 7], [255, 255, 255]]
+            "crack": [[255, 255, 255], [0, 0, 255]]
         }
 
         self.opt = {
-            "backbone": "segnet",
+            "backbone": "unet-leaky-relu",
             "logistic": "sigmoid",
             "loss": "bc",
-            "label_prep": "basic",
-            "input_shape": [512, 512, 3],
-            "batch_size": 1,
+            "label_prep": "fuzzy",
+            "input_shape": [256, 256, 3],
+            "batch_size": 2,
             "init_learning_rate": 1e-4,
             "use_augmentation": True,
-            "padding": True,
+            "padding": False,
         }
 
         self.randomized_split = False
