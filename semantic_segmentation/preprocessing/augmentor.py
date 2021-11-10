@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from skimage.transform import rotate
 '''
 In this file are all functions for image augmentation stored
 Important use following format for bboxes variabel!
@@ -108,17 +109,27 @@ def apply_rotation_90(img, lab):
     return img, lab
 
 
+def apply_tiny_rotation(img, lab):
+    img = img.astype(np.float)
+    lab = lab.astype(np.float)
+    rand_angle = np.random.randint(20) - 10
+    img = rotate(img, angle=rand_angle, mode="reflect")
+    lab = rotate(lab, angle=rand_angle, mode="reflect")
+    return img.astype(np.uint8), lab.astype(np.int)
+
+
 class Augmentor:
     def __init__(self):
         self.opt = {
             "horizontal_flip": True,
             "vertical_flip": True,
             "noise": True,
-            "auto_contrast": True,
+            "auto_contrast": False,
             "brightening": True,
             "blur": True,
-            "crop": False,
+            "crop": True,
             "rotation": True,
+            "tiny_rotation": True,
         }
 
     def apply(self, img, lab):
@@ -146,8 +157,8 @@ class Augmentor:
         if 0 == np.random.randint(6) and self.opt["crop"]:
             img, lab = apply_crop(img, lab)
 
-        # if np.random.randint(4):
-        #    img = apply_tiny_rotation(img)
+        if 0 == np.random.randint(6) and self.opt["tiny_rotation"]:
+            img, lab = apply_tiny_rotation(img, lab)
 
         if 0 == np.random.randint(6) and self.opt["rotation"]:
             img, lab = apply_rotation_90(img, lab)

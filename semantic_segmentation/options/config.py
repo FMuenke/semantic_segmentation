@@ -18,9 +18,7 @@ class Config:
             "optimizer": "lazy_adam",
             "input_shape": [224, 224, 3],
             "batch_size": 4,
-            "init_learning_rate": 1e-4,
             "use_augmentation": True,
-            "padding": False,
         }
 
         self.randomized_split = False

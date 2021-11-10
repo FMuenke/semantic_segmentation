@@ -15,7 +15,7 @@ class LbmTag:
         self.color_coding = color_coding
 
     def summary(self):
-        y, _ = self.load_y([100, 100])
+        y = self.load_y([100, 100])
         unique = [0]
         counts = [100*100]
         for i in range(y.shape[2]):

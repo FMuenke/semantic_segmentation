@@ -48,7 +48,9 @@ class SegNet:
         return conv
 
     def build(self, input_tensor):
-        pool1, mask1 = self.enc_unit(input_tensor, [64, 64], "enc_1")
+        pool0 = input_tensor
+        pool0 = Convolution2D(8, (7, 7), padding="same")(pool0)
+        pool1, mask1 = self.enc_unit(pool0, [64, 64], "enc_1")
         pool2, mask2 = self.enc_unit(pool1, [128, 128], "enc_2")
         pool3, mask3 = self.enc_unit(pool2, [256, 256, 256], "enc_3")
         pool4, mask4 = self.enc_unit(pool3, [512, 512, 512], "enc_4")
