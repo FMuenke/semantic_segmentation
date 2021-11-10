@@ -38,7 +38,14 @@ class LbmTag:
         """
         path_to_label_file = self.path_to_image_file.replace("images", "labels")
 
+        if path_to_label_file.endswith("GT.png"):
+            path_to_label_file = path_to_label_file.replace("GT.png", ".png")
+            return path_to_label_file
+
         path_to_label_file = path_to_label_file[:-4] + ".png"
+        if os.path.isfile(path_to_label_file):
+            return path_to_label_file
+        path_to_label_file = path_to_label_file[:-4] + "GT.png"
         if os.path.isfile(path_to_label_file):
             return path_to_label_file
         path_to_label_file = path_to_label_file[:-4] + ".tif"
@@ -77,7 +84,6 @@ class LbmTag:
 
     def load_y(self, label_size, label_prep=None):
         y_img = np.zeros((label_size[0], label_size[1], len(self.color_coding)))
-        counter = {0: 0, 1: 0}
         if self.path_to_label_file is not None:
             lbm = cv2.imread(self.path_to_label_file)
             lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
@@ -88,7 +94,6 @@ class LbmTag:
                                 and lbm[y, x, 1] == self.color_coding[cls][0][1] \
                                 and lbm[y, x, 2] == self.color_coding[cls][0][0]:
                             y_img[y, x, idx] = 1
-                            counter[idx] += 1
         lab_pro = LabelPreProcessor(label_prep)
         y_img = lab_pro.apply(y_img)
         return y_img

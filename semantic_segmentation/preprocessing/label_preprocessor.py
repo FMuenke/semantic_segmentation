@@ -9,25 +9,15 @@ class LabelPreProcessor:
 
     def _apply_gauss(self, label_map):
         for c in range(label_map.shape[2]):
-            label_map[:, :, c] = cv2.GaussianBlur(label_map[:, :, c], (61, 61), sigmaX=41)
+            channel = label_map[:, :, c]
+            blurred = cv2.GaussianBlur(channel, (61, 61), sigmaX=41)
+            channel[channel < 1] = blurred[channel < 1]
+            label_map[:, :, c] = channel
         return label_map
-
-    def _apply_for_ellipse(self, label_map):
-        e = Ellipse(label_map)
-        height, width = label_map.shape[:2]
-        diag = np.sqrt(height**2 + width**2)
-        param = [e.prop["centroid"][0] / height,
-                 e.prop["centroid"][1] / width,
-                 e.prop["orientation"],
-                 e.prop["major_axis_length"] / diag,
-                 e.prop["minor_axis_length"] / diag]
-        return [label_map, np.array(param)]
 
     def apply(self, label_map):
         h, w = label_map.shape[:2]
         if self.label_prep == "fuzzy":
             return self._apply_gauss(label_map)
-        if self.label_prep == "ellipse":
-            return self._apply_for_ellipse(label_map)
             # label_map = np.reshape(label_map, (h, w, 1))
-        return label_map, None
+        return label_map
