@@ -6,13 +6,13 @@ import numpy as np
 from semantic_segmentation.data_structure.folder import Folder
 
 from semantic_segmentation.options.config import load_config
-from semantic_segmentation.convolutional_neural_network.model_handler import ModelHandler
+from semantic_segmentation.convolutional_neural_network.semantic_segmentation_model import SemanticSegmentationModel
 
 
 class MaskHandler:
     def __init__(self, model_folder, target_classes):
         cfg = load_config(model_folder)
-        self.model_h = ModelHandler(model_folder, cfg)
+        self.model_h = SemanticSegmentationModel(model_folder, cfg)
         self.model_h.batch_size = 1
         self.model_h.build()
 

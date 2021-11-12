@@ -1,6 +1,6 @@
 import argparse
 
-from semantic_segmentation.convolutional_neural_network.model_handler import ModelHandler
+from semantic_segmentation.convolutional_neural_network.semantic_segmentation_model import SemanticSegmentationModel
 
 from semantic_segmentation.data_structure.data_set import DataSet
 
@@ -13,7 +13,7 @@ def main(args_):
 
     cfg = Config()
 
-    model_handler = ModelHandler(mf, cfg)
+    model_handler = SemanticSegmentationModel(mf, cfg)
     model_handler.build()
 
     save_config(model_dir=mf, cfg=cfg)
