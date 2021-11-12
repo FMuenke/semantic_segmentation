@@ -1,6 +1,4 @@
 import cv2
-import numpy as np
-from semantic_segmentation.geometric_shapes.ellipse import Ellipse
 
 
 class LabelPreProcessor:

@@ -20,7 +20,7 @@ class Config:
             "backbone": "unet-leaky-relu",
             "logistic": "sigmoid",
             "loss": "bc",
-            "label_prep": "fuzzy",
+            "label_prep": "basic",
             "input_shape": [256, 256, 3],
             "batch_size": 2,
             "init_learning_rate": 1e-4,
