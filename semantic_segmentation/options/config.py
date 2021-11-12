@@ -7,25 +7,20 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            # "asphalt": [[1, 1, 1], [255, 0, 0]],
-            # "marking": [[2, 2, 2], [0, 255, 0]],
-            # "nature": [[3, 3, 3], [0, 0, 255]],
-            # "stones": [[4, 4, 4], [0, 255, 255]],
-            # "earth": [[5, 5, 5], [0, 255, 255]],
-            # "drains": [[7, 7, 7], [255, 255, 255]]
-            "crack": [[255, 255, 255], [0, 0, 255]]
+            "crack": [[1, 1, 1], [0, 0, 255]],
+            "manhole": [[9, 9, 9], [200, 0, 0]]
         }
 
         self.opt = {
-            "backbone": "unet-leaky-relu",
+            "backbone": "unet",
             "logistic": "sigmoid",
             "loss": "bc",
             "label_prep": "basic",
-            "input_shape": [256, 256, 3],
-            "batch_size": 2,
-            "init_learning_rate": 1e-4,
+            "optimizer": "lazy_adam",
+            "input_shape": [224, 224, 3],
+            "batch_size": 4,
             "use_augmentation": True,
-            "padding": False,
+            "init_learning_rate": 10e-3,
         }
 
         self.randomized_split = False

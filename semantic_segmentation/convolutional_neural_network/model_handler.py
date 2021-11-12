@@ -3,6 +3,9 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras import optimizers
+
+from time import time
+import tensorflow_addons as tfa
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 
@@ -29,7 +32,6 @@ class ModelHandler:
         self.color_coding = cfg.color_coding
         self.input_shape = cfg.opt["input_shape"]
         self.backbone = cfg.opt["backbone"]
-        self.padding = cfg.opt["padding"]
         if "loss" in cfg.opt:
             self.loss_type = cfg.opt["loss"]
         else:
@@ -46,7 +48,16 @@ class ModelHandler:
             self.logistic = "sigmoid"
         self.model = None
 
-        self.optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
+        optimizer = None
+        if "optimizer" in cfg.opt:
+            if "adam" == cfg.opt["optimizer"]:
+                optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
+            elif "lazy_adam" == cfg.opt["optimizer"]:
+                optimizer = tfa.optimizers.LazyAdam(lr=cfg.opt["init_learning_rate"])
+        if optimizer is None:
+            optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
+        self.optimizer = optimizer
+
         if "batch_size" in cfg.opt:
             self.batch_size = cfg.opt["batch_size"]
         else:
@@ -97,7 +108,6 @@ class ModelHandler:
             if model_path is not None:
                 print("Model-Weights are loaded from: {}".format(model_path))
                 self.model.load_weights(model_path, by_name=True)
-                print("Model-Weights are loaded from: {}".format(model_path))
 
         else:
             print("No Weights were found")

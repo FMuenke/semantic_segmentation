@@ -15,7 +15,7 @@ class LbmTag:
         self.color_coding = color_coding
 
     def summary(self):
-        y, _ = self.load_y([100, 100])
+        y = self.load_y([100, 100])
         unique = [0]
         counts = [100*100]
         for i in range(y.shape[2]):
@@ -38,7 +38,14 @@ class LbmTag:
         """
         path_to_label_file = self.path_to_image_file.replace("images", "labels")
 
+        if path_to_label_file.endswith("GT.png"):
+            path_to_label_file = path_to_label_file.replace("GT.png", ".png")
+            return path_to_label_file
+
         path_to_label_file = path_to_label_file[:-4] + ".png"
+        if os.path.isfile(path_to_label_file):
+            return path_to_label_file
+        path_to_label_file = path_to_label_file[:-4] + "GT.png"
         if os.path.isfile(path_to_label_file):
             return path_to_label_file
         path_to_label_file = path_to_label_file[:-4] + ".tif"

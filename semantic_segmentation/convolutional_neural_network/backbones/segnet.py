@@ -4,6 +4,7 @@ from tensorflow.keras.layers import (
     Convolution2D,
     ReLU,
     LeakyReLU,
+    SpatialDropout2D,
 )
 
 from semantic_segmentation.convolutional_neural_network.layer.pool_and_unpool import MaxPoolingWithArgmax2D, MaxUnpooling2D
@@ -43,6 +44,7 @@ class SegNet:
 
     def lat_unit(self, x, num_filter, stage):
         conv = self.conv_block(x, num_filter, stage)
+        conv = SpatialDropout2D(rate=0.2)(conv)
         return conv
 
     def build(self, input_tensor):
