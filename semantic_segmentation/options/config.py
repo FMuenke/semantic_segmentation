@@ -15,7 +15,7 @@ class Config:
         }
 
         self.opt = {
-            "backbone": "unet",
+            "backbone": "unet_small",
             "logistic": "sigmoid",
             "loss": "bc",
             "label_prep": "basic",

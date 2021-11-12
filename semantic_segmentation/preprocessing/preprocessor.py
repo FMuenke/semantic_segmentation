@@ -98,10 +98,4 @@ class Preprocessor:
             label_map = np.expand_dims(label_map, axis=2)
         return label_map
 
-    def un_apply(self, image):
-        if self.obox is not None:
-            image = image[:, self.obox[1]:self.obox[3], self.obox[0]:self.obox[2], :]
-            self.obox = None
-        return image
-
 

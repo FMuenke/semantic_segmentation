@@ -69,7 +69,7 @@ class UNet:
 
     def build(self, input_tensor):
         pool0 = Convolution2D(8, (7, 7), padding="same")(input_tensor)
-        pool1, conv1 = self.enc_unit(input_tensor, 64, stage=1)
+        pool1, conv1 = self.enc_unit(pool0, 64, stage=1)
         pool2, conv2 = self.enc_unit(pool1, 128, stage=2)
         pool3, conv3 = self.enc_unit(pool2, 256, stage=3)
         pool4, conv4 = self.enc_unit(pool3, 512, stage=4)

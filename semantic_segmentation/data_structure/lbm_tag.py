@@ -60,12 +60,18 @@ class LbmTag:
             lbm = cv2.imread(self.path_to_label_file)
             lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
             for idx, cls in enumerate(self.color_coding):
-                for x in range(label_size[1]):
-                    for y in range(label_size[0]):
-                        if lbm[y, x, 0] == self.color_coding[cls][0][2] \
-                                and lbm[y, x, 1] == self.color_coding[cls][0][1] \
-                                and lbm[y, x, 2] == self.color_coding[cls][0][0]:
-                            y_img[y, x, :] = self.color_coding[cls][1]
+                c0 = np.zeros((label_size[0], label_size[1]))
+                c1 = np.zeros((label_size[0], label_size[1]))
+                c2 = np.zeros((label_size[0], label_size[1]))
+
+                c0[lbm[:, :, 0] == self.color_coding[cls][0][2]] = 1
+                c1[lbm[:, :, 1] == self.color_coding[cls][0][1]] = 1
+                c2[lbm[:, :, 2] == self.color_coding[cls][0][0]] = 1
+                c = c0 + c1 + c2
+                iy, ix = np.where(c == 3)
+                y_img[iy, ix, :] = [self.color_coding[cls][1][2],
+                                    self.color_coding[cls][1][1],
+                                    self.color_coding[cls][1][0]]
         return y_img
 
     def load_y(self, label_size, label_prep=None):
@@ -74,12 +80,15 @@ class LbmTag:
             lbm = cv2.imread(self.path_to_label_file)
             lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
             for idx, cls in enumerate(self.color_coding):
-                for x in range(label_size[1]):
-                    for y in range(label_size[0]):
-                        if lbm[y, x, 0] == self.color_coding[cls][0][2] \
-                                and lbm[y, x, 1] == self.color_coding[cls][0][1] \
-                                and lbm[y, x, 2] == self.color_coding[cls][0][0]:
-                            y_img[y, x, idx] = 1
+                c0 = np.zeros((label_size[0], label_size[1]))
+                c1 = np.zeros((label_size[0], label_size[1]))
+                c2 = np.zeros((label_size[0], label_size[1]))
+
+                c0[lbm[:, :, 0] == self.color_coding[cls][0][2]] = 1
+                c1[lbm[:, :, 1] == self.color_coding[cls][0][1]] = 1
+                c2[lbm[:, :, 2] == self.color_coding[cls][0][0]] = 1
+                c = c0 + c1 + c2
+                y_img[c == 3] = idx + 1
         lab_pro = LabelPreProcessor(label_prep)
         y_img = lab_pro.apply(y_img)
         return y_img

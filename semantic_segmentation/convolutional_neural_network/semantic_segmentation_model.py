@@ -78,7 +78,6 @@ class SemanticSegmentationModel:
         img = preprocessor.apply(data)
         img = np.expand_dims(img, axis=0)
         res = self.model.predict_on_batch(img)
-        res = preprocessor.un_apply(res)
         return res
 
     def build(self, compile_model=True):
@@ -135,14 +134,14 @@ class SemanticSegmentationModel:
 
         checkpoint = ModelCheckpoint(
             os.path.join(self.model_folder, "weights-final.hdf5"),
-            monitor="val_accuracy",
+            monitor="val_loss",
             verbose=1,
             save_best_only=True,
-            mode="max",
+            mode="min",
         )
 
         reduce_lr = ReduceLROnPlateau(factor=0.5, verbose=1)
-        early_stop = EarlyStopping(monitor="val_accuracy", patience=20, verbose=1, min_delta=0.005)
+        early_stop = EarlyStopping(monitor="val_loss", patience=20, verbose=1, min_delta=0.005)
 
         callback_list = [checkpoint, reduce_lr, early_stop]
 
