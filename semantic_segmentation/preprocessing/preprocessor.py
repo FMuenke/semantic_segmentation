@@ -4,13 +4,12 @@ from semantic_segmentation.data_structure.image_handler import ImageHandler
 
 
 class Preprocessor:
-    def __init__(self, image_size, padding=False):
+    def __init__(self, image_size):
         self.image_size = image_size
         self.min_height = 16
         self.min_width = 16
         self.max_height = 900
         self.max_width = 900
-        self.do_padding = padding
 
         self.obox = None
 
@@ -78,10 +77,7 @@ class Preprocessor:
         return x
 
     def apply(self, image):
-        if self.do_padding:
-            image = self.pad(image)
-        else:
-            image = self.resize(image)
+        image = self.resize(image)
         img_h = ImageHandler(image)
         if self.image_size[2] == 1:
             image = img_h.gray()
@@ -97,32 +93,10 @@ class Preprocessor:
                           interpolation=cv2.INTER_NEAREST)
 
     def apply_to_label_map(self, label_map):
-        if not self.do_padding:
-            label_map = self.lbm_resize(label_map, width=self.image_size[1], height=self.image_size[0])
-            if len(label_map.shape) < 3:
-                label_map = np.expand_dims(label_map, axis=2)
-            return label_map
-        else:
-            height, width, ch = label_map.shape
-            if height > width:
-                if height >= self.image_size[0]:
-                    new_height = self.image_size[0]
-                    new_width = int(width * new_height / height)
-                    label_map = self.lbm_resize(label_map, width=new_width, height=new_height)
-            else:
-                if width >= self.image_size[1]:
-                    new_width = self.image_size[1]
-                    new_height = int(height * new_width / width)
-                    label_map = self.lbm_resize(label_map, width=new_width, height=new_height)
-            ih, iw = label_map.shape[:2]
-            ph, pw = self.image_size[0], self.image_size[1]
-            x = np.zeros((ph, pw, ch))
-            sy1 = int(ph / 2) - int(ih / 2)
-            sx1 = int(pw / 2) - int(iw / 2)
-            if len(label_map.shape) < 3:
-                label_map = np.expand_dims(label_map, axis=2)
-            x[sy1:sy1 + ih, sx1:sx1 + iw, :] = label_map
-            return x
+        label_map = self.lbm_resize(label_map, width=self.image_size[1], height=self.image_size[0])
+        if len(label_map.shape) < 3:
+            label_map = np.expand_dims(label_map, axis=2)
+        return label_map
 
     def un_apply(self, image):
         if self.obox is not None:

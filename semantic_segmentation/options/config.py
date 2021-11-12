@@ -8,6 +8,9 @@ class Config:
 
         self.color_coding = {
             "crack": [[1, 1, 1], [0, 0, 255]],
+            # "patch": [[2, 2, 2], [0, 100, 0]],
+            # "outburst": [[4, 4, 4], [0, 100, 100]],
+            # "filled_crack": [[6, 6, 6], [100, 100, 0]],
             "manhole": [[9, 9, 9], [200, 0, 0]]
         }
 

@@ -74,7 +74,7 @@ class SemanticSegmentationModel:
         return result
 
     def inference(self, data):
-        preprocessor = Preprocessor(self.input_shape, padding=self.padding)
+        preprocessor = Preprocessor(self.input_shape)
         img = preprocessor.apply(data)
         img = np.expand_dims(img, axis=0)
         res = self.model.predict_on_batch(img)
@@ -123,7 +123,6 @@ class SemanticSegmentationModel:
             label_size=self.input_shape,
             batch_size=self.batch_size,
             augmentor=Augmentor(),
-            padding=self.padding,
             label_prep=self.label_prep,
         )
         validation_generator = DataGenerator(
@@ -131,7 +130,6 @@ class SemanticSegmentationModel:
             image_size=self.input_shape,
             label_size=self.input_shape,
             batch_size=self.batch_size,
-            padding=self.padding,
             label_prep=self.label_prep
         )
 

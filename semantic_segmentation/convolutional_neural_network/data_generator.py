@@ -67,7 +67,7 @@ class DataGenerator(keras.utils.Sequence):
             if self.augmentor is not None:
                 img, lab1 = self.augmentor.apply(img, lab1)
 
-            preprocessor = Preprocessor(image_size=self.image_size, padding=self.padding)
+            preprocessor = Preprocessor(image_size=self.image_size)
             img = preprocessor.apply(img)
             lab1 = preprocessor.apply_to_label_map(lab1)
             x.append(img)

@@ -4,7 +4,6 @@ import numpy as np
 
 from semantic_segmentation.data_structure.image_handler import ImageHandler
 from semantic_segmentation.preprocessing.label_preprocessor import LabelPreProcessor
-from semantic_segmentation.geometric_shapes.ellipse import Ellipse
 
 
 class LbmTag:
@@ -36,30 +35,17 @@ class LbmTag:
         Returns:
             estimated full path to label file
         """
-        path_to_label_file = self.path_to_image_file.replace("images", "labels")
+        base_name = os.path.basename(self.path_to_image_file)[:-4]
+        base_dir = os.path.dirname(self.path_to_image_file).replace("images", "labels")
 
-        if path_to_label_file.endswith("GT.png"):
-            path_to_label_file = path_to_label_file.replace("GT.png", ".png")
-            return path_to_label_file
+        extensions = [
+            ".png", ".jpg", ".jpeg", ".tif", ".tiff", "_label.tiff", "_label.tif", "GT.png"
+        ]
 
-        path_to_label_file = path_to_label_file[:-4] + ".png"
-        if os.path.isfile(path_to_label_file):
-            return path_to_label_file
-        path_to_label_file = path_to_label_file[:-4] + "GT.png"
-        if os.path.isfile(path_to_label_file):
-            return path_to_label_file
-        path_to_label_file = path_to_label_file[:-4] + ".tif"
-        if os.path.isfile(path_to_label_file):
-            return path_to_label_file
-        path_to_label_file = path_to_label_file[:-4] + ".tiff"
-        if os.path.isfile(path_to_label_file):
-            return path_to_label_file
-        path_to_label_file = path_to_label_file[:-5] + "_label.tiff"
-        if os.path.isfile(path_to_label_file):
-            return path_to_label_file
-        path_to_label_file = path_to_label_file[:-5] + ".tif"
-        if os.path.isfile(path_to_label_file):
-            return path_to_label_file
+        for ext in extensions:
+            pot_label_name = os.path.join(base_dir, base_name + ext)
+            if os.path.isfile(pot_label_name):
+                return pot_label_name
         return None
 
     def load_x(self):
