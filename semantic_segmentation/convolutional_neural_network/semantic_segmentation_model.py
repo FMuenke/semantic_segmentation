@@ -25,7 +25,7 @@ except Exception as e:
     print("ATTENTION: GPU IS NOT USED....")
 
 
-class ModelHandler:
+class SemanticSegmentationModel:
     def __init__(self, model_folder, cfg):
         self.model_folder = model_folder
 
