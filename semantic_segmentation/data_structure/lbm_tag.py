@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 
 from semantic_segmentation.data_structure.image_handler import ImageHandler
-from semantic_segmentation.preprocessing.label_preprocessor import LabelPreProcessor
 
 
 class LbmTag:
@@ -69,9 +68,9 @@ class LbmTag:
                 c2[lbm[:, :, 2] == self.color_coding[cls][0][0]] = 1
                 c = c0 + c1 + c2
                 iy, ix = np.where(c == 3)
-                y_img[iy, ix, :] = [self.color_coding[cls][1][2],
+                y_img[iy, ix, :] = [self.color_coding[cls][1][0],
                                     self.color_coding[cls][1][1],
-                                    self.color_coding[cls][1][0]]
+                                    self.color_coding[cls][1][2]]
         return y_img
 
     def load_y(self, label_size, label_prep=None):
@@ -88,9 +87,11 @@ class LbmTag:
                 c1[lbm[:, :, 1] == self.color_coding[cls][0][1]] = 1
                 c2[lbm[:, :, 2] == self.color_coding[cls][0][0]] = 1
                 c = c0 + c1 + c2
-                y_img[c == 3] = idx + 1
-        lab_pro = LabelPreProcessor(label_prep)
-        y_img = lab_pro.apply(y_img)
+
+                y_img_cls = np.zeros((label_size[0], label_size[1]))
+                y_img_cls[c == 3] = 1
+                y_img[:, :, idx] = y_img_cls
+
         return y_img
 
     def write_result(self, res_path, color_map):

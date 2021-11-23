@@ -11,7 +11,7 @@ class Config:
             # "patch": [[2, 2, 2], [0, 100, 0]],
             # "outburst": [[4, 4, 4], [0, 100, 100]],
             # "filled_crack": [[6, 6, 6], [100, 100, 0]],
-            "manhole": [[9, 9, 9], [200, 0, 0]]
+            # "manhole": [[9, 9, 9], [200, 0, 0]]
         }
 
         self.opt = {
@@ -23,7 +23,7 @@ class Config:
             "input_shape": [224, 224, 3],
             "batch_size": 4,
             "use_augmentation": True,
-            "init_learning_rate": 10e-3,
+            "init_learning_rate": 10e-5,
         }
 
         self.randomized_split = False
