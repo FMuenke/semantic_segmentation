@@ -1,6 +1,7 @@
 from semantic_segmentation.convolutional_neural_network.backbones.unet import UNet
 from semantic_segmentation.convolutional_neural_network.backbones.pspnet import PSPNet
 from semantic_segmentation.convolutional_neural_network.backbones.segnet import SegNet
+from semantic_segmentation.convolutional_neural_network.backbones.deeplabv3 import Deeplabv3
 
 from semantic_segmentation.convolutional_neural_network.losses import dice, focal_loss, jaccard, weighted_cross_entropy, mixed
 
@@ -38,6 +39,10 @@ class BackboneHandler:
         output_func = self.output_func
         if self.backbone_type in ["unet", "unet-relu"]:
             model = UNet(num_classes, output_function=output_func)
+            return model.build(input_layer)
+
+        if self.backbone_type in ["deeplabv3"]:
+            model = Deeplabv3(num_classes, output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type == "unet-leaky-relu":

@@ -15,13 +15,13 @@ class Config:
         }
 
         self.opt = {
-            "backbone": "unet_small",
+            "backbone": "deeplabv3",
             "logistic": "sigmoid",
             "loss": "bc",
             "label_prep": "basic",
-            "optimizer": "lazy_adam",
-            "input_shape": [224, 224, 3],
-            "batch_size": 4,
+            "optimizer": "adam",
+            "input_shape": [256, 256, 3],
+            "batch_size": 1,
             "use_augmentation": True,
             "init_learning_rate": 10e-5,
         }

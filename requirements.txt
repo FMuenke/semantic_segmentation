@@ -1,5 +1,6 @@
 opencv-python
 tqdm
-tensorflow-gpu==2.1
 scikit-image
 numpy
+tensorflow-gpu==2.4
+tensorflow-addons==0.14.0
