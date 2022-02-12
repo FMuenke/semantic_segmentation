@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras import optimizers
 
-from time import time
+import pickle
 import tensorflow_addons as tfa
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
@@ -151,13 +151,14 @@ class SemanticSegmentationModel:
 
         callback_list = [checkpoint, reduce_lr, early_stop]
 
-        self.model.fit(
+        history = self.model.fit(
             x=training_generator,
             validation_data=validation_generator,
             callbacks=callback_list,
             epochs=self.epochs,
         )
-
+        with open(os.path.join(self.model_folder, "training_history.pkl"), 'wb') as file_pi:
+            pickle.dump(history.history, file_pi)
 
 
 

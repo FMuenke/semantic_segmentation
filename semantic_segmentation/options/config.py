@@ -7,7 +7,7 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            "crack": [[1, 1, 1], [0, 0, 255]],
+            "crack": [[255, 255, 255], [0, 0, 255]],
             # "patch": [[2, 2, 2], [0, 100, 0]],
             # "outburst": [[4, 4, 4], [0, 100, 100]],
             # "filled_crack": [[6, 6, 6], [100, 100, 0]],
@@ -15,7 +15,7 @@ class Config:
         }
 
         self.opt = {
-            "backbone": "deeplabv3",
+            "backbone": "unet",
             "logistic": "sigmoid",
             "loss": "bc",
             "label_prep": "basic",

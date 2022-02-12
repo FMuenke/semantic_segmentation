@@ -49,7 +49,7 @@ def parse_args():
         help="Path to directory with images and labels folder",
     )
     parser.add_argument(
-        "--model_folder", "-m", default="./test", help="Path to model directory"
+        "--model_folder", "-model", default="./test", help="Path to model directory"
     )
     return parser.parse_args()
 

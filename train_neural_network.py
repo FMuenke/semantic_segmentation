@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 
 from semantic_segmentation.convolutional_neural_network.semantic_segmentation_model import SemanticSegmentationModel
 
@@ -20,7 +21,15 @@ def main(args_):
 
     d_set = DataSet(df, cfg.color_coding)
     tag_set = d_set.load()
+
     train_set, validation_set = d_set.split(tag_set, random=cfg.randomized_split)
+    number_to_train_on = int(args_.number_training_images)
+    if number_to_train_on != 0:
+        train_set = np.random.choice(train_set, number_to_train_on, replace=False)
+        number_to_train_on = np.min([number_to_train_on, len(validation_set) - 1])
+        validation_set = np.random.choice(validation_set, number_to_train_on, replace=False)
+        print("Number of Training images reduced! - {}/{} -".format(len(train_set), len(validation_set)))
+        cfg.opt["batch_size"] = np.min([int(args_.number_training_images), cfg.opt["batch_size"]])
 
     model_handler.fit(train_set, validation_set)
 
@@ -30,11 +39,18 @@ def parse_args():
     parser.add_argument(
         "--dataset_folder",
         "-df",
-        default="./data/train",
         help="Path to directory with predictions",
     )
     parser.add_argument(
-        "--model_folder", "-m", default="./test", help="Path to model directory"
+        "--model_folder",
+        "-model",
+        help="Path to model directory"
+    )
+    parser.add_argument(
+        "--number_training_images",
+        "-n",
+        default=-1,
+        help="Limit the amount of training data [-1: use all data]"
     )
     return parser.parse_args()
 
