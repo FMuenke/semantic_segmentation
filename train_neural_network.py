@@ -29,7 +29,6 @@ def main(args_):
         number_to_train_on = np.min([number_to_train_on, len(validation_set) - 1])
         validation_set = np.random.choice(validation_set, number_to_train_on, replace=False)
         print("Number of Training images reduced! - {}/{} -".format(len(train_set), len(validation_set)))
-        cfg.opt["batch_size"] = np.min([int(args_.number_training_images), cfg.opt["batch_size"]])
 
     model_handler.fit(train_set, validation_set)
 
@@ -49,7 +48,7 @@ def parse_args():
     parser.add_argument(
         "--number_training_images",
         "-n",
-        default=-1,
+        default=0,
         help="Limit the amount of training data [-1: use all data]"
     )
     return parser.parse_args()

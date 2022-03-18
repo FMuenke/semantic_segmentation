@@ -12,8 +12,8 @@ class StatsHandler:
                 "fp": 0,
             }
 
-    def count(self, cls, t):
-        self.s[cls][t] += 1
+    def count(self, cls, t, val):
+        self.s[cls][t] += val
 
     def eval(self):
         for cls in self.s:

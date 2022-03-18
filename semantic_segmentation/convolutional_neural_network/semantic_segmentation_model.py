@@ -86,7 +86,7 @@ class SemanticSegmentationModel:
         return res
 
     def build(self, compile_model=True):
-        input_layer = Input(batch_shape=(self.batch_size,
+        input_layer = Input(batch_shape=(None,
                                          self.input_shape[0],
                                          self.input_shape[1],
                                          self.input_shape[2],
@@ -122,6 +122,8 @@ class SemanticSegmentationModel:
             print("Only Batch Size of 1 is possible.")
             self.batch_size = 1
 
+        self.batch_size = np.min([len(tag_set_train), len(tag_set_test), self.batch_size])
+
         training_generator = DataGenerator(
             tag_set_train,
             image_size=self.input_shape,
@@ -146,8 +148,8 @@ class SemanticSegmentationModel:
             mode="min",
         )
 
-        reduce_lr = ReduceLROnPlateau(factor=0.5, verbose=1)
-        early_stop = EarlyStopping(monitor="val_loss", patience=20, verbose=1, min_delta=0.005)
+        reduce_lr = ReduceLROnPlateau(factor=0.5, verbose=1, patience=40)
+        early_stop = EarlyStopping(monitor="val_loss", patience=80, verbose=1, min_delta=0.005)
 
         callback_list = [checkpoint, reduce_lr, early_stop]
 
