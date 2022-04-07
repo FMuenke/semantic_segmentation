@@ -399,10 +399,7 @@ def duc(x, factor=8, output_shape=(512, 512, 1)):
 def Interp(x, shape):
     ''' interpolation '''
     new_height, new_width = shape
-    resized = tf.image.resize_images(
-            x,
-            [int(new_height), int(new_width)],
-            align_corners=True)
+    resized = tf.image.resize(x, [int(new_height), int(new_width)])
     return resized
 
 

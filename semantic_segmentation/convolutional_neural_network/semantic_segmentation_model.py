@@ -11,7 +11,6 @@ from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, Early
 
 
 from semantic_segmentation.convolutional_neural_network.backbone_handler import BackboneHandler
-from semantic_segmentation.convolutional_neural_network.logistics_handler import LogisticsHandler
 from semantic_segmentation.convolutional_neural_network.data_generator import DataGenerator
 
 from semantic_segmentation.preprocessing.augmentor import Augmentor
@@ -59,6 +58,8 @@ class SemanticSegmentationModel:
                 optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
             elif "lazy_adam" == cfg.opt["optimizer"]:
                 optimizer = tfa.optimizers.LazyAdam(lr=cfg.opt["init_learning_rate"])
+            elif "ranger" == cfg.opt["optimizer"]:
+                optimizer = tfa.optimizers.RectifiedAdam(learning_rate=cfg.opt["init_learning_rate"])
         if optimizer is None:
             optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
         self.optimizer = optimizer
@@ -69,14 +70,20 @@ class SemanticSegmentationModel:
             self.batch_size = 1
         self.epochs = 1000
 
-    def predict_tag(self, tag):
-        return self.predict(tag.load_data())
+    def predict_tag(self, tag, confidence_threshold):
+        return self.predict(tag.load_data(), confidence_threshold)
 
-    def predict(self, data):
+    def predict(self, data, confidence_threshold):
         y_pred = self.inference(data)
-        logistics_h = LogisticsHandler(num_classes=len(self.color_coding), label_prep=self.label_prep)
-        result = logistics_h.decode(y_pred, self.color_coding)
-        return result
+        y_pred = y_pred[0, :, :, :]
+        h, w = y_pred.shape[:2]
+        color_map = np.zeros((h, w, 3))
+        for i, cls in enumerate(self.color_coding):
+            idxs = np.where(y_pred[:, :, i] > confidence_threshold)
+            color_map[idxs[0], idxs[1], :] = self.color_coding[cls][1]
+        # logistics_h = LogisticsHandler(num_classes=len(self.color_coding), label_prep=self.label_prep)
+        # result = logistics_h.decode(y_pred, self.color_coding)
+        return color_map
 
     def inference(self, data):
         preprocessor = Preprocessor(self.input_shape)
@@ -86,7 +93,7 @@ class SemanticSegmentationModel:
         return res
 
     def build(self, compile_model=True):
-        input_layer = Input(batch_shape=(None,
+        input_layer = Input(batch_shape=(self.batch_size,
                                          self.input_shape[0],
                                          self.input_shape[1],
                                          self.input_shape[2],
@@ -148,8 +155,9 @@ class SemanticSegmentationModel:
             mode="min",
         )
 
-        reduce_lr = ReduceLROnPlateau(factor=0.5, verbose=1, patience=40)
-        early_stop = EarlyStopping(monitor="val_loss", patience=80, verbose=1, min_delta=0.005)
+        patience = 100
+        reduce_lr = ReduceLROnPlateau(factor=0.5, verbose=1, patience=int(patience*0.5))
+        early_stop = EarlyStopping(monitor="val_loss", patience=patience, verbose=1)
 
         callback_list = [checkpoint, reduce_lr, early_stop]
 

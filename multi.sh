@@ -1,9 +1,10 @@
 #!/bin/sh
-while getopts d:m: flag
+while getopts d:m:z: flag
 do
     case "${flag}" in
         d) data_folder=${OPTARG};;
         m) model_folder=${OPTARG};;
+        z) zip_name=${OPTARG};;
     esac
 done
 
@@ -21,7 +22,10 @@ do
     else
       echo "Start Run: $i"
       # echo "-df $data_folder -model $current_model_folder -n $n"
-      python train_neural_network.py -df $data_folder -model $current_model_folder -n $n
+      python train_neural_network.py -df $data_folder"/train" -model $current_model_folder -n $n
+      python test_neural_network.py -df $data_folder"/test" -model $current_model_folder
     fi
   done
 done
+
+zip -r "/media/fmuenke/8c63b673-ade7-4948-91ca-aba40636c42c/ai_models/"$zip_name $model_folder

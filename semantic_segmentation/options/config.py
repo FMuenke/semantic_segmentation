@@ -12,16 +12,17 @@ class Config:
             # "outburst": [[4, 4, 4], [0, 100, 100]],
             # "filled_crack": [[6, 6, 6], [100, 100, 0]],
             # "manhole": [[9, 9, 9], [200, 0, 0]],
-            "crack": [[255, 255, 255], [0, 0, 255]],
-            # "top": [[50, 50, 50], [255, 0, 0]],
-            # "edge": [[100, 100, 100], [0, 255, 0]],
-            # "edge_lowered": [[150, 150, 150], [0, 0, 255]],
+            # "ellipse": [[255, 255, 255], [0, 0, 255]],
+            "top": [[50, 50, 50], [255, 0, 0]],
+            "edge": [[100, 100, 100], [0, 255, 0]],
+            "edge_lowered": [[150, 150, 150], [0, 0, 255]],
+            # "bg": [[0, 0, 0], [0, 0, 0]],
         }
 
         self.opt = {
-            "backbone": "unet",
+            "backbone": "segnet",
             "logistic": "sigmoid",
-            "loss": "bc",
+            "loss": "dice",
             "label_prep": "basic",
             "optimizer": "adam",
             "input_shape": [256, 256, 3],

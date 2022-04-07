@@ -2,6 +2,8 @@ from semantic_segmentation.convolutional_neural_network.backbones.unet import UN
 from semantic_segmentation.convolutional_neural_network.backbones.pspnet import PSPNet
 from semantic_segmentation.convolutional_neural_network.backbones.segnet import SegNet
 from semantic_segmentation.convolutional_neural_network.backbones.deeplabv3 import Deeplabv3
+from semantic_segmentation.convolutional_neural_network.backbones.residual_unet import ResidualUNet
+from semantic_segmentation.convolutional_neural_network.backbones.unet_plus import UNetPlus
 
 from semantic_segmentation.convolutional_neural_network.losses import dice, focal_loss, jaccard, weighted_cross_entropy, mixed
 
@@ -39,6 +41,14 @@ class BackboneHandler:
         output_func = self.output_func
         if self.backbone_type in ["unet", "unet-relu"]:
             model = UNet(num_classes, output_function=output_func)
+            return model.build(input_layer)
+
+        if self.backbone_type in ["res-unet"]:
+            model = ResidualUNet(num_classes, output_function=output_func)
+            return model.build(input_layer)
+
+        if self.backbone_type in ["unet+", "unet_plus", "unet-plus"]:
+            model = UNetPlus(num_classes, output_function=output_func)
             return model.build(input_layer)
 
         if self.backbone_type in ["unet-no-batchnorm"]:

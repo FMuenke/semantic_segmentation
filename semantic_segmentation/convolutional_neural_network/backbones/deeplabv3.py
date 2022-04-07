@@ -32,6 +32,7 @@ from tensorflow.python.keras.layers import Convolution2D
 from tensorflow.python.keras.layers import DepthwiseConv2D
 from tensorflow.python.keras.layers import ZeroPadding2D
 from tensorflow.python.keras.layers import GlobalAveragePooling2D
+from tensorflow.python.keras.layers import Lambda
 
 
 def SepConv_BN(x, filters, prefix, stride=1, kernel_size=3, rate=1, depth_activation=False, epsilon=1e-3):
@@ -197,6 +198,13 @@ def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id, ski
     return x
 
 
+def Interp(x, shape):
+    ''' interpolation '''
+    new_height, new_width = shape
+    resized = tf.image.resize(x, [int(new_height), int(new_width)])
+    return resized
+
+
 class Deeplabv3:
     def __init__(self, num_classes,
                  output_function="sigmoid",
@@ -330,7 +338,8 @@ class Deeplabv3:
         b4 = Activation(tf.nn.relu)(b4)
         # upsample. have to use compat because of the option align_corners
         size_before = tf.keras.backend.int_shape(x)
-        b4 = tf.keras.layers.experimental.preprocessing.Resizing(*size_before[1:3], interpolation="bilinear")(b4)
+        # b4 = tf.keras.layers.experimental.preprocessing.Resizing(*size_before[1:3], interpolation="bilinear")(b4)
+        b4 = Lambda(Interp, arguments={'shape': size_before[1:3]})(b4)
         # simple 1x1
         b0 = Convolution2D(256, (1, 1), padding='same', use_bias=False, name='aspp0')(x)
         b0 = BatchNormalization(name='aspp0_BN', epsilon=1e-5)(b0)
@@ -360,7 +369,8 @@ class Deeplabv3:
             # Feature projection
             # x4 (x2) block
             skip_size = tf.keras.backend.int_shape(skip1)
-            x = tf.keras.layers.experimental.preprocessing.Resizing(*skip_size[1:3], interpolation="bilinear")(x)
+            # x = tf.keras.layers.experimental.preprocessing.Resizing(*skip_size[1:3], interpolation="bilinear")(x)
+            x = Lambda(Interp, arguments={'shape': skip_size[1:3]})(x)
             dec_skip1 = Convolution2D(48, (1, 1), padding='same', use_bias=False, name='feature_projection0')(skip1)
             dec_skip1 = BatchNormalization(name='feature_projection0_BN', epsilon=1e-5)(dec_skip1)
             dec_skip1 = Activation(tf.nn.relu)(dec_skip1)
@@ -370,7 +380,8 @@ class Deeplabv3:
 
         x = Convolution2D(self.num_classes, (1, 1), padding='same', name="classification")(x)
         size_before3 = tf.keras.backend.int_shape(input_tensor)
-        x = tf.keras.layers.experimental.preprocessing.Resizing(*size_before3[1:3], interpolation="bilinear")(x)
+        # x = tf.keras.layers.experimental.preprocessing.Resizing(*size_before3[1:3], interpolation="bilinear")(x)
+        x = Lambda(Interp, arguments={'shape': size_before3[1:3]})(x)
 
         if self.activation in {'softmax', 'sigmoid'}:
             x = tf.keras.layers.Activation(self.activation)(x)

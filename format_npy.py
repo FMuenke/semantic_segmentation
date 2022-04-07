@@ -4,7 +4,7 @@ import cv2
 
 
 def main():
-    path = "/media/fmuenke/8c63b673-ade7-4948-91ca-aba40636c42c/datasets/data_stormdrains/data_stormdrains/train/outsticking_stormdrains/labels"
+    path = "/home/fmuenke/datasets/storm_drain_segmentation/train/labels"
 
     for np_f in os.listdir(path):
         if not np_f.endswith(".npy"):

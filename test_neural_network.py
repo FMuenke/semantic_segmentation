@@ -14,6 +14,7 @@ from semantic_segmentation.data_structure.stats_handler import StatsHandler
 def main(args_):
     df = args_.dataset_folder
     mf = args_.model_folder
+    conf = float(args_.confidence)
     cfg = load_config(model_dir=mf)
     model_handler = SemanticSegmentationModel(mf, cfg)
     model_handler.batch_size = 1
@@ -30,14 +31,17 @@ def main(args_):
 
     sh = StatsHandler(cfg.color_coding)
     for tid in tqdm(t_set):
-        color_map = model_handler.predict(t_set[tid].load_x())
+        color_map = model_handler.predict(t_set[tid].load_x(), conf)
         t_set[tid].write_result(res_fol.path(), color_map)
         t_set[tid].eval(color_map, sh)
         t_set[tid].visualize_result(vis_fol.path(), color_map)
 
     sh.eval()
     sh.show()
-    sh.write_report(os.path.join(mf, "report.txt"))
+    if conf == 0.5:
+        sh.write_report(os.path.join(mf, "report.txt"))
+    else:
+        sh.write_report(os.path.join(mf, "report_{}.txt".format(conf)))
 
 
 def parse_args():
@@ -50,6 +54,9 @@ def parse_args():
     )
     parser.add_argument(
         "--model_folder", "-model", default="./test", help="Path to model directory"
+    )
+    parser.add_argument(
+        "--confidence", "-conf", default=0.5, help="Confidence to accept a classification"
     )
     return parser.parse_args()
 

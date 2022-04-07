@@ -8,6 +8,8 @@ bboxes = [bbox, bbox2, bbox3, ... ]
 with bbox = [classname, x1_abs, y1_abs, x2_abs, y2_abs, (prob)]
 '''
 
+from synthetic_data.noise import SaltNPepper, Blurring, ChannelShift
+
 
 def apply_auto_contrast(img):
     for ch in range(img.shape[2]):
@@ -16,21 +18,22 @@ def apply_auto_contrast(img):
     return img
 
 
-def apply_noise(img, low=1, high=10):
-    noise = np.random.randint(low=low, high=high, size=img.shape, dtype='uint8')
-    img += noise
-    return img
+def apply_noise(img):
+    noise = SaltNPepper(
+        max_delta=np.random.choice([5, 10, 15]),
+        grain_size=np.random.choice([1, 2, 4, 8])
+    )
+    return noise.apply(img)
 
 
-def apply_blurr(img):
-    img = cv2.blur(img, (5, 5))
-    return img
+def apply_blur(img):
+    noise = Blurring(kernel=9, randomness=5)
+    return noise.apply(img)
 
 
-def apply_brightening(img):
-    scale = np.random.random() + 0.5
-    img = np.round(scale * img)
-    return img
+def apply_channel_shift(img):
+    noise = ChannelShift(intensity=0.025)
+    return noise.apply(img)
 
 
 def apply_horizontal_flip(img, lab):
@@ -121,15 +124,15 @@ def apply_tiny_rotation(img, lab):
 class Augmentor:
     def __init__(self):
         self.opt = {
-            "horizontal_flip": True,
-            "vertical_flip": True,
+            "horizontal_flip": False,
+            "vertical_flip": False,
+            "crop": True,
+            "rotation": False,
+            "tiny_rotation": True,
+
             "noise": True,
-            "auto_contrast": False,
             "brightening": True,
             "blur": True,
-            "crop": True,
-            "rotation": True,
-            "tiny_rotation": True,
         }
 
     def apply(self, img, lab):
@@ -145,14 +148,11 @@ class Augmentor:
         if 0 == np.random.randint(5) and self.opt["noise"]:
             img = apply_noise(img)
 
-        if 0 == np.random.randint(10) and self.opt["auto_contrast"]:
-            img = apply_auto_contrast(img)
-
         if 0 == np.random.randint(5) and self.opt["brightening"]:
-            img = apply_brightening(img)
+            img = apply_channel_shift(img)
 
         if 0 == np.random.randint(5) and self.opt["blur"]:
-            img = apply_blurr(img)
+            img = apply_blur(img)
 
         if 0 == np.random.randint(6) and self.opt["crop"]:
             img, lab = apply_crop(img, lab)

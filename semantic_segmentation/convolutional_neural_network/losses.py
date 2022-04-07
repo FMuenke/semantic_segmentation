@@ -25,8 +25,8 @@ def jaccard():
         Jaccard = (|X & Y|)/ (|X|+ |Y| - |X & Y|)
                 = sum(|A*B|)/(sum(|A|)+sum(|B|)-sum(|A*B|))
 
-        The jaccard distance loss is usefull for unbalanced datasets. This has been
-        shifted so it converges on 0 and is smoothed to avoid exploding or disapearing
+        The jaccard distance loss is useful for unbalanced datasets. This has been
+        shifted so it converges on 0 and is smoothed to avoid exploding or disappearing
         gradient.
 
         Ref: https://en.wikipedia.org/wiki/Jaccard_index

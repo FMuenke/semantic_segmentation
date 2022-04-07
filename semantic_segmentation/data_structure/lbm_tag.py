@@ -109,10 +109,9 @@ class LbmTag:
         cv2.imwrite(res_file, color_map)
 
     def eval(self, color_map, stats_handler):
+        # Classes are compared by comparing the three color values in the image for every pixel
         height, width = color_map.shape[:2]
         if self.path_to_label_file is not None:
-            # lbm = cv2.imread(self.path_to_label_file)
-            # lbm = cv2.resize(lbm, (width, height), interpolation=cv2.INTER_NEAREST)
             lbm = self.load_y_as_color_map((height, width))
             for idx, cls in enumerate(self.color_coding):
                 cls_key = self.color_coding[cls][1]
