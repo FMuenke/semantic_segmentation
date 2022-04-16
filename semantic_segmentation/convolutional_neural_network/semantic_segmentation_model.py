@@ -81,8 +81,6 @@ class SemanticSegmentationModel:
         for i, cls in enumerate(self.color_coding):
             idxs = np.where(y_pred[:, :, i] > confidence_threshold)
             color_map[idxs[0], idxs[1], :] = self.color_coding[cls][1]
-        # logistics_h = LogisticsHandler(num_classes=len(self.color_coding), label_prep=self.label_prep)
-        # result = logistics_h.decode(y_pred, self.color_coding)
         return color_map
 
     def inference(self, data):
@@ -93,7 +91,7 @@ class SemanticSegmentationModel:
         return res
 
     def build(self, compile_model=True):
-        input_layer = Input(batch_shape=(self.batch_size,
+        input_layer = Input(batch_shape=(None,
                                          self.input_shape[0],
                                          self.input_shape[1],
                                          self.input_shape[2],

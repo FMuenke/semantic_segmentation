@@ -11,6 +11,7 @@ from tensorflow.keras.layers import (
 )
 import tensorflow as tf
 from tensorflow_addons import activations
+import tensorflow_addons as tfa
 
 
 class UNetPlus:
@@ -30,24 +31,35 @@ class UNetPlus:
             return Activation(activations.mish)(x)
         raise ValueError("Unknown activation option: {}".format(self.activation))
 
+    def norm_unit(self, x):
+        if self.batch_norm:
+            # x = BatchNormalization()(x)
+            x = tfa.layers.GroupNormalization()(x)
+        return x
+
     def enc_unit(self, x, num_filter, stage):
         conv = Convolution2D(num_filter, 3, padding='same', kernel_initializer='he_normal',
                              name="unet_conv{}1".format(stage))(x)
         conv = self.act_unit(conv)
-        if self.batch_norm:
-            conv = BatchNormalization()(conv)
+        conv = self.norm_unit(conv)
         conv = Convolution2D(num_filter, 3, padding='same', kernel_initializer='he_normal',
                              name="unet_conv{}2".format(stage))(conv)
         conv = self.act_unit(conv)
-        if self.batch_norm:
-            conv = BatchNormalization()(conv)
+        conv = self.norm_unit(conv)
         pool = Convolution2D(num_filter, 3, strides=(2, 2), padding="same", kernel_initializer='he_normal',
                              name="unet_down_sample{}".format(stage))(conv)
+        pool = self.act_unit(pool)
+        pool = self.norm_unit(pool)
         return pool, conv
 
     def dec_unit(self, convh, convl, num_filter, stage):
         up = Conv2DTranspose(num_filter, 3, strides=(2, 2), padding="same", kernel_initializer='he_normal',
                              name="unet_up_sample{}".format(stage))(convh)
+        up = self.act_unit(up)
+        up = self.norm_unit(up)
+        if self.batch_norm:
+            up = BatchNormalization()(up)
+            up = tfa.layers.GroupNormalization()(up)
         up = Convolution2D(num_filter, 2, padding='same', kernel_initializer='he_normal',
                            name="unet_up{}0".format(stage))(up)
         up = self.act_unit(up)
@@ -55,13 +67,11 @@ class UNetPlus:
         conv = Convolution2D(num_filter, 3, padding='same', kernel_initializer='he_normal',
                              name="unet_up{}1".format(stage))(merge)
         conv = self.act_unit(conv)
-        if self.batch_norm:
-            conv = BatchNormalization()(conv)
+        conv = self.norm_unit(conv)
         conv = Convolution2D(num_filter, 3, padding='same', kernel_initializer='he_normal',
                              name="unet_up{}2".format(stage))(conv)
         conv = self.act_unit(conv)
-        if self.batch_norm:
-            conv = BatchNormalization()(conv)
+        conv = self.norm_unit(conv)
         return conv
 
     def build(self, input_tensor):

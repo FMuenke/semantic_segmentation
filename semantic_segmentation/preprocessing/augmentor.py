@@ -124,15 +124,15 @@ def apply_tiny_rotation(img, lab):
 class Augmentor:
     def __init__(self):
         self.opt = {
-            "horizontal_flip": False,
-            "vertical_flip": False,
+            "horizontal_flip": True,
+            "vertical_flip": True,
             "crop": True,
-            "rotation": False,
-            "tiny_rotation": True,
+            "rotation": True,
+            "tiny_rotation": False,
 
-            "noise": True,
-            "brightening": True,
-            "blur": True,
+            "noise": False,
+            "brightening": False,
+            "blur": False,
         }
 
     def apply(self, img, lab):
