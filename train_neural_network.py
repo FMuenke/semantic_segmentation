@@ -22,17 +22,18 @@ def main(args_):
     d_set = DataSet(df, cfg.color_coding)
     tag_set = d_set.load()
 
-    train_set, validation_set = d_set.split(tag_set, random=cfg.randomized_split)
     number_to_train_on = int(args_.number_training_images)
     if number_to_train_on != 0:
         seed_id = int(mf.split("-RUN-")[-1])
         rng = np.random.default_rng(seed_id)
-        train_set = rng.choice(train_set, number_to_train_on, replace=False)
-        number_to_train_on = np.min([number_to_train_on, len(validation_set) - 1])
-        validation_set = rng.choice(validation_set, number_to_train_on, replace=False)
+        train_set = rng.choice(tag_set, number_to_train_on, replace=False)
+        number_to_train_on = np.min([number_to_train_on, len(tag_set) - 1])
+        validation_set = rng.choice(tag_set, number_to_train_on, replace=False)
         print("Number of Training images reduced! - {}/{} -".format(len(train_set), len(validation_set)))
-
-    model_handler.fit(train_set, validation_set)
+        model_handler.fit(train_set, validation_set)
+    else:
+        train_set, validation_set = d_set.split(tag_set, percentage=0.5, random=cfg.randomized_split)
+        model_handler.fit(train_set, validation_set)
 
 
 def parse_args():
