@@ -25,11 +25,14 @@ def main(args_):
     number_to_train_on = int(args_.number_training_images)
     if number_to_train_on != 0:
         tags = [tag_set[t] for t in tag_set]
+        half = len(tags) // 2
+        train_tags = tags[:half]
+        test_tags = tags[half:]
         seed_id = int(mf.split("-RUN-")[-1])
         rng = np.random.default_rng(seed_id)
-        train_set = rng.choice(tags, number_to_train_on, replace=False)
+        train_set = rng.choice(train_tags, number_to_train_on, replace=False)
         number_to_train_on = np.min([number_to_train_on, len(tags) - 1])
-        validation_set = rng.choice(tags, number_to_train_on, replace=False)
+        validation_set = rng.choice(test_tags, number_to_train_on, replace=False)
         print("Number of Training images reduced! - {}/{} -".format(len(train_set), len(validation_set)))
         model_handler.fit(train_set, validation_set)
     else:
