@@ -25,9 +25,11 @@ def main(args_):
     train_set, validation_set = d_set.split(tag_set, random=cfg.randomized_split)
     number_to_train_on = int(args_.number_training_images)
     if number_to_train_on != 0:
-        train_set = np.random.choice(train_set, number_to_train_on, replace=False)
+        seed_id = int(mf.split("-RUN-")[-1])
+        rng = np.random.default_rng(seed_id)
+        train_set = rng.choice(train_set, number_to_train_on, replace=False)
         number_to_train_on = np.min([number_to_train_on, len(validation_set) - 1])
-        validation_set = np.random.choice(validation_set, number_to_train_on, replace=False)
+        validation_set = rng.choice(validation_set, number_to_train_on, replace=False)
         print("Number of Training images reduced! - {}/{} -".format(len(train_set), len(validation_set)))
 
     model_handler.fit(train_set, validation_set)
