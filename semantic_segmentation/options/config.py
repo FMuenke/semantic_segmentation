@@ -7,35 +7,30 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            # "crack": [[1, 1, 1], [0, 0, 255]],
-            # "patch": [[2, 2, 2], [0, 100, 0]],
-            # "outburst": [[4, 4, 4], [0, 100, 100]],
-            # "filled_crack": [[6, 6, 6], [100, 100, 0]],
-            # "manhole": [[9, 9, 9], [200, 0, 0]],
-            "ellipse": [[255, 255, 255], [0, 0, 255]],
-            # "top": [[50, 50, 50], [255, 0, 0]],
-            # "edge": [[100, 100, 100], [0, 255, 0]],
-            # "edge_lowered": [[150, 150, 150], [0, 0, 255]],
-            # "bg": [[0, 0, 0], [0, 0, 0]],
+            "top": [0, [255, 255, 255]],
+            "edge": [1, [10, 217, 252]],
+            "edge_lowered": [2, [150, 101, 146]],
+            # "curbstone": [3, [22, 124, 99]],
+            # "leaves": [4, [232, 139, 150]],
         }
 
         self.opt = {
             "backbone": "unet",
             "logistic": "sigmoid",
-            "loss": "dice",
+            "loss": "bc",
             "label_prep": "basic",
             "optimizer": "adam",
             "input_shape": [256, 256, 3],
-            "batch_size": 8,
-            "use_augmentation": True,
-            "init_learning_rate": 10e-5,
+            "batch_size": 4,
+            "use_augmentation": False,
+            "init_learning_rate": 0.001,  # 0.00001 (deeplab)
         }
 
         self.randomized_split = False
 
 
 def load_config(model_dir):
-    print("Load cfg from model directory")
+    print("[INFO] Load cfg from model directory")
     color_coding_path = os.path.join(model_dir, "color_coding.json")
     opt_path = os.path.join(model_dir, "opt.json")
     cfg = Config()
@@ -45,7 +40,7 @@ def load_config(model_dir):
 
 
 def save_config(model_dir, cfg):
-    print("config.pickle is saved to {}".format(model_dir))
+    print("[INFO] config.pickle is saved to {}".format(model_dir))
     fol = Folder(model_dir)
     fol.check_n_make_dir()
     color_coding_path = os.path.join(model_dir, "color_coding.json")

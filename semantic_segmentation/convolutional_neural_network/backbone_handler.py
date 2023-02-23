@@ -55,10 +55,6 @@ class BackboneHandler:
             model = UNet(num_classes, batch_norm=False, output_function=output_func)
             return model.build(input_layer)
 
-        if self.backbone_type in ["deeplabv3"]:
-            model = Deeplabv3(num_classes, output_function=output_func)
-            return model.build(input_layer)
-
         if self.backbone_type == "unet-leaky-relu":
             model = UNet(num_classes, activation="leaky_relu", output_function=output_func)
             return model.build(input_layer)

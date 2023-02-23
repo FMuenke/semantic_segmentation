@@ -12,6 +12,11 @@ class LbmTag:
 
         self.color_coding = color_coding
 
+        if self.path_to_label_file.endswith(".npy"):
+            self.full_label_map = True
+        else:
+            self.full_label_map = False
+
     def summary(self):
         y = self.load_y([100, 100])
         unique = [0]
@@ -38,7 +43,7 @@ class LbmTag:
         base_dir = os.path.dirname(self.path_to_image_file).replace("images", "labels")
 
         extensions = [
-            ".png", ".jpg", ".jpeg", ".tif", ".tiff", "_label.tiff", "_label.tif", "GT.png"
+            ".png", ".jpg", ".jpeg", ".tif", ".tiff", "_label.tiff", "_label.tif", "GT.png", ".npy"
         ]
 
         for ext in extensions:
@@ -55,7 +60,19 @@ class LbmTag:
 
     def load_y_as_color_map(self, label_size):
         y_img = np.zeros((label_size[0], label_size[1], 3))
-        if self.path_to_label_file is not None:
+        if self.path_to_label_file is None:
+            return y_img
+
+        if self.full_label_map:
+            lbm = np.load(self.path_to_label_file)
+            lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
+            for idx, cls in enumerate(self.color_coding):
+                iy, ix = np.where(lbm[:, :, idx] == 1)
+                y_img[iy, ix, :] = [self.color_coding[cls][1][0],
+                                    self.color_coding[cls][1][1],
+                                    self.color_coding[cls][1][2]]
+            return y_img
+        else:
             lbm = cv2.imread(self.path_to_label_file)
             lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
             for idx, cls in enumerate(self.color_coding):
@@ -71,26 +88,32 @@ class LbmTag:
                 y_img[iy, ix, :] = [self.color_coding[cls][1][0],
                                     self.color_coding[cls][1][1],
                                     self.color_coding[cls][1][2]]
-        return y_img
+            return y_img
 
     def load_y(self, label_size, label_prep=None):
         y_img = np.zeros((label_size[0], label_size[1], len(self.color_coding)))
-        if self.path_to_label_file is not None:
-            lbm = cv2.imread(self.path_to_label_file)
-            lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
-            for idx, cls in enumerate(self.color_coding):
-                c0 = np.zeros((label_size[0], label_size[1]))
-                c1 = np.zeros((label_size[0], label_size[1]))
-                c2 = np.zeros((label_size[0], label_size[1]))
+        if self.path_to_label_file is None:
+            return y_img
+        if self.full_label_map:
+            y_img = np.load(self.path_to_label_file)
+            classes_to_sample = [self.color_coding[cls][0] for cls in self.color_coding]
+            y_img = y_img[:, :, classes_to_sample]
+            return y_img
+        lbm = cv2.imread(self.path_to_label_file)
+        lbm = cv2.resize(lbm, (label_size[1], label_size[0]), interpolation=cv2.INTER_NEAREST)
+        for idx, cls in enumerate(self.color_coding):
+            c0 = np.zeros((label_size[0], label_size[1]))
+            c1 = np.zeros((label_size[0], label_size[1]))
+            c2 = np.zeros((label_size[0], label_size[1]))
 
-                c0[lbm[:, :, 0] == self.color_coding[cls][0][2]] = 1
-                c1[lbm[:, :, 1] == self.color_coding[cls][0][1]] = 1
-                c2[lbm[:, :, 2] == self.color_coding[cls][0][0]] = 1
-                c = c0 + c1 + c2
+            c0[lbm[:, :, 0] == self.color_coding[cls][0][2]] = 1
+            c1[lbm[:, :, 1] == self.color_coding[cls][0][1]] = 1
+            c2[lbm[:, :, 2] == self.color_coding[cls][0][0]] = 1
+            c = c0 + c1 + c2
 
-                y_img_cls = np.zeros((label_size[0], label_size[1]))
-                y_img_cls[c == 3] = 1
-                y_img[:, :, idx] = y_img_cls
+            y_img_cls = np.zeros((label_size[0], label_size[1]))
+            y_img_cls[c == 3] = 1
+            y_img[:, :, idx] = y_img_cls
 
         return y_img
 

@@ -1,11 +1,16 @@
 import os
+import sys
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras import optimizers
+from tensorflow import keras
+from tensorflow.keras import backend as k
+
+from semantic_segmentation.convolutional_neural_network.backbones.deeplabv3 import Deeplabv3
 
 import pickle
-import tensorflow_addons as tfa
+# import tensorflow_addons as tfa
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 
@@ -56,10 +61,10 @@ class SemanticSegmentationModel:
         if "optimizer" in cfg.opt:
             if "adam" == cfg.opt["optimizer"]:
                 optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
-            elif "lazy_adam" == cfg.opt["optimizer"]:
-                optimizer = tfa.optimizers.LazyAdam(lr=cfg.opt["init_learning_rate"])
-            elif "ranger" == cfg.opt["optimizer"]:
-                optimizer = tfa.optimizers.RectifiedAdam(learning_rate=cfg.opt["init_learning_rate"])
+            # elif "lazy_adam" == cfg.opt["optimizer"]:
+            #     optimizer = tfa.optimizers.LazyAdam(lr=cfg.opt["init_learning_rate"])
+            # elif "ranger" == cfg.opt["optimizer"]:
+            #     optimizer = tfa.optimizers.RectifiedAdam(learning_rate=cfg.opt["init_learning_rate"])
         if optimizer is None:
             optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
         self.optimizer = optimizer
@@ -91,12 +96,12 @@ class SemanticSegmentationModel:
         return res
 
     def build(self, compile_model=True):
+        num_classes = len(self.color_coding)
         input_layer = Input(batch_shape=(None,
                                          self.input_shape[0],
                                          self.input_shape[1],
                                          self.input_shape[2],
                                          ))
-        num_classes = len(self.color_coding)
         backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic, loss_type=self.loss_type)
         x = backbone_h.build(input_layer)
 
@@ -104,9 +109,9 @@ class SemanticSegmentationModel:
         # print(self.model.summary())
 
         self.load()
-
         if compile_model:
-            self.model.compile(loss=backbone_h.loss(), optimizer=self.optimizer, metrics=backbone_h.metric())
+            # opt = keras.optimizers.Adam(learning_rate=0.00001)
+            self.model.compile(loss=backbone_h.loss(), metrics=backbone_h.metric(), optimizer=self.optimizer)
 
     def load(self):
         model_path = None
