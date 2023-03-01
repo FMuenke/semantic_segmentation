@@ -43,7 +43,8 @@ class LbmTag:
         base_dir = os.path.dirname(self.path_to_image_file).replace("images", "labels")
 
         extensions = [
-            ".png", ".jpg", ".jpeg", ".tif", ".tiff", "_label.tiff", "_label.tif", "GT.png", ".npy"
+            ".png", ".jpg", ".jpeg", ".tif", ".tiff", "_label.tiff", "_label.tif", "_label.png",
+            "segmentation.png", "GT.png", ".npy"
         ]
 
         for ext in extensions:

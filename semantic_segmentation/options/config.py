@@ -1,5 +1,6 @@
 import os
 import json
+import tensorflow as tf
 from semantic_segmentation.data_structure.folder import Folder
 
 
@@ -7,15 +8,15 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            "top": [0, [255, 255, 255]],
-            "edge": [1, [10, 217, 252]],
-            "edge_lowered": [2, [150, 101, 146]],
+            "top": [[255, 255, 255], [255, 255, 255]],
+            # "edge": [1, [10, 217, 252]],
+            # "edge_lowered": [2, [150, 101, 146]],
             # "curbstone": [3, [22, 124, 99]],
             # "leaves": [4, [232, 139, 150]],
         }
 
         self.opt = {
-            "backbone": "unet",
+            "backbone": "unet-resent34",
             "logistic": "sigmoid",
             "loss": "bc",
             "label_prep": "basic",
@@ -24,6 +25,7 @@ class Config:
             "batch_size": 4,
             "use_augmentation": False,
             "init_learning_rate": 0.001,  # 0.00001 (deeplab)
+            "tf-version": tf.__version__,
         }
 
         self.randomized_split = False

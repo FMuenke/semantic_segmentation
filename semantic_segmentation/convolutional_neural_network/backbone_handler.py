@@ -1,11 +1,30 @@
 from semantic_segmentation.convolutional_neural_network.backbones.unet import UNet
 from semantic_segmentation.convolutional_neural_network.backbones.pspnet import PSPNet
 from semantic_segmentation.convolutional_neural_network.backbones.segnet import SegNet
-from semantic_segmentation.convolutional_neural_network.backbones.deeplabv3 import Deeplabv3
+# from semantic_segmentation.convolutional_neural_network.backbones.deeplabv3 import Deeplabv3
 from semantic_segmentation.convolutional_neural_network.backbones.residual_unet import ResidualUNet
 from semantic_segmentation.convolutional_neural_network.backbones.unet_plus import UNetPlus
 
 from semantic_segmentation.convolutional_neural_network.losses import dice, focal_loss, jaccard, weighted_cross_entropy, mixed
+
+
+def get_loss(loss_type):
+    if loss_type in ["focal", "focal_loss"]:
+        return focal_loss()
+    if loss_type in ["binary_crossentropy", "bc"]:
+        return "binary_crossentropy"
+    if loss_type == "dice":
+        return dice()
+    if loss_type == "jaccard":
+        return jaccard()
+    if loss_type == "weighted_cross_entropy":
+        return weighted_cross_entropy(100)
+    if loss_type == "mixed":
+        return mixed()
+    if loss_type in ["mean_squared_error", "mse"]:
+        return "mean_squared_error"
+
+    raise ValueError("Loss Type unknown {}".format(self.loss_type))
 
 
 class BackboneHandler:
@@ -16,25 +35,7 @@ class BackboneHandler:
         self.loss_type = loss_type
 
     def loss(self):
-        if self.loss_type in ["focal", "focal_loss"]:
-            return focal_loss()
-        if self.loss_type in ["binary_crossentropy", "bc"]:
-            return "binary_crossentropy"
-        if self.loss_type == "dice":
-            return dice()
-        if self.loss_type == "jaccard":
-            return jaccard()
-        if self.loss_type == "weighted_cross_entropy":
-            return weighted_cross_entropy(100)
-        if self.loss_type == "mixed":
-            return mixed()
-        if self.loss_type in ["mean_squared_error", "mse"]:
-            return "mean_squared_error"
-
-        raise ValueError("Loss Type unknown {}".format(self.loss_type))
-
-    def metric(self):
-        return ["accuracy"]
+        return get_loss(self.loss_type)
 
     def build(self, input_layer):
         num_classes = self.num_classes

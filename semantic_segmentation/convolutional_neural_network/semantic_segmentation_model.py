@@ -1,25 +1,21 @@
 import os
-import sys
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras import optimizers
-from tensorflow import keras
-from tensorflow.keras import backend as k
-
-from semantic_segmentation.convolutional_neural_network.backbones.deeplabv3 import Deeplabv3
+import segmentation_models as sm
 
 import pickle
-# import tensorflow_addons as tfa
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 
-
-from semantic_segmentation.convolutional_neural_network.backbone_handler import BackboneHandler
+from semantic_segmentation.convolutional_neural_network.backbone_handler import BackboneHandler, get_loss
 from semantic_segmentation.convolutional_neural_network.data_generator import DataGenerator
 
 from semantic_segmentation.preprocessing.augmentor import Augmentor
 from semantic_segmentation.preprocessing.preprocessor import Preprocessor
+
+SM_FRAMEWORK = tf.keras
 
 try:
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -102,16 +98,22 @@ class SemanticSegmentationModel:
                                          self.input_shape[1],
                                          self.input_shape[2],
                                          ))
-        backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic, loss_type=self.loss_type)
-        x = backbone_h.build(input_layer)
-
-        self.model = Model(inputs=input_layer, outputs=x)
+        if self.backbone == "unet-resent34":
+            self.model = sm.Unet('resnet34', classes=num_classes, encoder_weights='imagenet')
+        elif self.backbone == "unet-resent50":
+            self.model = sm.Unet('resnet50', classes=num_classes, encoder_weights='imagenet')
+        elif self.backbone == "pspnet-resnet50":
+            self.model = sm.PSPNet('resnet50', classes=num_classes, encoder_weights='imagenet')
+        else:
+            backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic, loss_type=self.loss_type)
+            x = backbone_h.build(input_layer)
+            self.model = Model(inputs=input_layer, outputs=x)
         # print(self.model.summary())
 
         self.load()
         if compile_model:
             # opt = keras.optimizers.Adam(learning_rate=0.00001)
-            self.model.compile(loss=backbone_h.loss(), metrics=backbone_h.metric(), optimizer=self.optimizer)
+            self.model.compile(loss=get_loss(self.loss_type), metrics=["accuracy"], optimizer=self.optimizer)
 
     def load(self):
         model_path = None

@@ -95,7 +95,7 @@ class SaltNPepper:
         snp_w = max(int(w / self.grain_size), 3)
         snp = np.random.randint(-self.max_delta, self.max_delta, size=[snp_h, snp_w, c])
         snp = cv2.resize(snp, (w, h), interpolation=cv2.INTER_NEAREST)
-        img = img.astype(np.int) + snp
+        img = img.astype(np.int32) + snp
         return np.clip(img, 0, 255).astype(np.uint8)
 
 
