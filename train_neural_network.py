@@ -1,5 +1,7 @@
 import argparse
+import os
 import numpy as np
+from time import time
 
 from semantic_segmentation.convolutional_neural_network.semantic_segmentation_model import SemanticSegmentationModel
 
@@ -22,6 +24,7 @@ def main(args_):
     d_set = DataSet(df, cfg.color_coding)
     tag_set = d_set.load()
 
+    t0 = time()
     number_to_train_on = int(args_.number_training_images)
     if number_to_train_on != 0:
         tags = [tag_set[t] for t in tag_set]
@@ -36,8 +39,10 @@ def main(args_):
         print("Number of Training images reduced! - {}/{} -".format(len(train_set), len(validation_set)))
         model_handler.fit(train_set, validation_set)
     else:
-        train_set, validation_set = d_set.split(tag_set, percentage=0.5, random=cfg.randomized_split)
+        train_set, validation_set = d_set.split(tag_set, percentage=0.1, random=cfg.randomized_split)
         model_handler.fit(train_set, validation_set)
+    with open(os.path.join(mf, "time.txt"), "w") as f:
+        f.write("[INFO] done in %0.3fs" % (time() - t0))
 
 
 def parse_args():

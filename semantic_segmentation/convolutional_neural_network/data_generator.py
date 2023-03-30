@@ -1,20 +1,19 @@
 from tensorflow import keras
 import numpy as np
 
-from semantic_segmentation.preprocessing.preprocessor import Preprocessor
+from semantic_segmentation.preprocessing.pre_processing import pre_processing, resize_lab
 
 
 class DataGenerator(keras.utils.Sequence):
     def __init__(
-        self,
-        tag_set,
-        batch_size,
-        image_size,
-        label_size,
-        shuffle=False,
-        augmentor=None,
-        padding=False,
-        label_prep=None,
+            self,
+            tag_set,
+            batch_size,
+            image_size,
+            label_size,
+            backbone,
+            shuffle=False,
+            augmentor=None,
     ):
         self.image_size = image_size
         self.label_size = label_size
@@ -22,8 +21,7 @@ class DataGenerator(keras.utils.Sequence):
         self.tag_set = tag_set
         self.shuffle = shuffle
         self.augmentor = augmentor
-        self.padding = padding
-        self.label_prep = label_prep
+        self.backbone = backbone
         self.indexes = np.arange(len(self.tag_set))
         self.on_epoch_end()
 
@@ -40,7 +38,7 @@ class DataGenerator(keras.utils.Sequence):
             index (int)
         """
         # Generate indexes of the batch
-        indexes = self.indexes[index * self.batch_size : (index + 1) * self.batch_size]
+        indexes = self.indexes[index * self.batch_size: (index + 1) * self.batch_size]
         tags_temp = [self.tag_set[k] for k in indexes]
 
         x, y = self.__data_generation(tags_temp)
@@ -59,21 +57,20 @@ class DataGenerator(keras.utils.Sequence):
         Generates data containing the batch_size samples.
         """
         x = []
-        y1 = []
+        y = []
         for i, tag in enumerate(tags_temp):
             img = tag.load_x()
-            lab1 = tag.load_y((img.shape[0], img.shape[1]), label_prep=self.label_prep)
+            lab = tag.load_y((img.shape[0], img.shape[1]))
 
             if self.augmentor is not None:
-                img, lab1 = self.augmentor.apply(img, lab1)
+                img, lab = self.augmentor.apply(img, lab)
 
-            preprocessor = Preprocessor(image_size=self.image_size)
-            img = preprocessor.apply(img)
-            lab1 = preprocessor.apply_to_label_map(lab1)
+            img = pre_processing(img, input_shape=self.image_size, backbone=self.backbone)
+            lab = resize_lab(lab, input_shape=self.image_size)
             x.append(img)
-            y1.append(lab1)
+            y.append(lab)
 
         x = np.array(x)
-        y = np.array(y1)
+        y = np.array(y)
 
         return x, y

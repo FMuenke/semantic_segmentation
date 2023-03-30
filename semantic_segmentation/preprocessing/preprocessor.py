@@ -3,6 +3,20 @@ import cv2
 from semantic_segmentation.data_structure.image_handler import ImageHandler
 
 
+def normalize(image):
+    epsilon = 1e-6
+    mean_mat = np.mean(image)
+    var_mat = np.var(image)
+    if var_mat != 0:
+        mat_norm = (image - mean_mat) / var_mat
+        min_mat = np.min(mat_norm)
+        max_mat = np.max(mat_norm)
+        mat_norm = (mat_norm - min_mat) / (max_mat - min_mat + epsilon)
+    else:
+        mat_norm = np.zeros(image.shape)
+    return mat_norm
+
+
 class Preprocessor:
     def __init__(self, image_size):
         self.image_size = image_size
@@ -18,19 +32,6 @@ class Preprocessor:
         if None in self.image_size:
             return self.rescale(image, self.max_width, self.max_height, is_lbm=False)
         return img_h.resize(height=self.image_size[0], width=self.image_size[1])
-
-    def normalize(self, image):
-        epsilon = 1e-6
-        mean_mat = np.mean(image)
-        var_mat = np.var(image)
-        if var_mat != 0:
-            mat_norm = (image - mean_mat) / var_mat
-            min_mat = np.min(mat_norm)
-            max_mat = np.max(mat_norm)
-            mat_norm = (mat_norm - min_mat) / (max_mat - min_mat + epsilon)
-        else:
-            mat_norm = np.zeros(image.shape)
-        return mat_norm
 
     def rescale(self, data, max_width, max_height, is_lbm=False):
         height, width = data.shape[0], data.shape[1]
@@ -82,7 +83,7 @@ class Preprocessor:
         if self.image_size[2] == 1:
             image = img_h.gray()
             image = np.expand_dims(image, axis=2)
-        image = self.normalize(image)
+        image = normalize(image)
         return image
 
     def lbm_resize(self, lbm, width, height):

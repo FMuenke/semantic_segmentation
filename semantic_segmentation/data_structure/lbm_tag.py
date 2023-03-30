@@ -44,7 +44,7 @@ class LbmTag:
 
         extensions = [
             ".png", ".jpg", ".jpeg", ".tif", ".tiff", "_label.tiff", "_label.tif", "_label.png",
-            "segmentation.png", "GT.png", ".npy"
+            "_segmentation.png", "GT.png", ".npy"
         ]
 
         for ext in extensions:

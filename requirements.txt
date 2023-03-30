@@ -2,5 +2,6 @@ opencv-python
 tqdm
 scikit-image
 numpy
+# pip install -U segmentation-models
 # tensorflow==2.4
 # tensorflow-addons==0.14.0

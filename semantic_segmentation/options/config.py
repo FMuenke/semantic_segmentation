@@ -16,15 +16,15 @@ class Config:
         }
 
         self.opt = {
-            "backbone": "unet-resent34",
+            "backbone": "unet-resnet18-imagenet",
             "logistic": "sigmoid",
             "loss": "bc",
             "label_prep": "basic",
             "optimizer": "adam",
             "input_shape": [256, 256, 3],
-            "batch_size": 4,
-            "use_augmentation": False,
-            "init_learning_rate": 0.001,  # 0.00001 (deeplab)
+            "batch_size": 8,
+            "use_augmentation": True,
+            "init_learning_rate": 10e-4,  # 0.00001 (deeplab)
             "tf-version": tf.__version__,
         }
 

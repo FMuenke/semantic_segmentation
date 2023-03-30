@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import cv2
 import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras import optimizers
@@ -13,21 +14,26 @@ from semantic_segmentation.convolutional_neural_network.backbone_handler import 
 from semantic_segmentation.convolutional_neural_network.data_generator import DataGenerator
 
 from semantic_segmentation.preprocessing.augmentor import Augmentor
-from semantic_segmentation.preprocessing.preprocessor import Preprocessor
+from semantic_segmentation.preprocessing.pre_processing import pre_processing
 
-SM_FRAMEWORK = tf.keras
+# SM_FRAMEWORK = tf.keras
+sm.set_framework('tf.keras')
+sm.framework()
 
-try:
-    physical_devices = tf.config.experimental.list_physical_devices('GPU')
-    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+# try:
+#     physical_devices = tf.config.experimental.list_physical_devices('GPU')
+#     tf.config.experimental.set_memory_growth(physical_devices[0], True)
     # tf.config.experimental.set_virtual_device_configuration(
     #     physical_devices[0],
     #     tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)
     # )
 
-except Exception as e:
-    print(e)
-    print("ATTENTION: GPU IS NOT USED....")
+# except Exception as e:
+#     print(e)
+#     print("ATTENTION: GPU IS NOT USED....")
+
+
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 
 class SemanticSegmentationModel:
@@ -57,10 +63,6 @@ class SemanticSegmentationModel:
         if "optimizer" in cfg.opt:
             if "adam" == cfg.opt["optimizer"]:
                 optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
-            # elif "lazy_adam" == cfg.opt["optimizer"]:
-            #     optimizer = tfa.optimizers.LazyAdam(lr=cfg.opt["init_learning_rate"])
-            # elif "ranger" == cfg.opt["optimizer"]:
-            #     optimizer = tfa.optimizers.RectifiedAdam(learning_rate=cfg.opt["init_learning_rate"])
         if optimizer is None:
             optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
         self.optimizer = optimizer
@@ -69,7 +71,7 @@ class SemanticSegmentationModel:
             self.batch_size = cfg.opt["batch_size"]
         else:
             self.batch_size = 1
-        self.epochs = 1000
+        self.epochs = 10000
 
     def predict_tag(self, tag, confidence_threshold):
         return self.predict(tag.load_data(), confidence_threshold)
@@ -85,10 +87,8 @@ class SemanticSegmentationModel:
         return color_map
 
     def inference(self, data):
-        preprocessor = Preprocessor(self.input_shape)
-        img = preprocessor.apply(data)
-        img = np.expand_dims(img, axis=0)
-        res = self.model.predict_on_batch(img)
+        data = pre_processing(data, input_shape=self.input_shape, backbone=self.backbone)
+        res = self.model.predict_on_batch(np.expand_dims(data, axis=0))
         return res
 
     def build(self, compile_model=True):
@@ -98,11 +98,17 @@ class SemanticSegmentationModel:
                                          self.input_shape[1],
                                          self.input_shape[2],
                                          ))
-        if self.backbone == "unet-resent34":
-            self.model = sm.Unet('resnet34', classes=num_classes, encoder_weights='imagenet')
-        elif self.backbone == "unet-resent50":
+        if self.backbone == "unet-resnet18":
+            self.model = sm.Unet('resnet18', classes=num_classes, encoder_weights=None)
+        elif self.backbone == "unet-resnet18-imagenet":
+            self.model = sm.Unet('resnet18', classes=num_classes, encoder_weights='imagenet')
+        elif self.backbone == "unet-resnet50":
+            self.model = sm.Unet('resnet50', classes=num_classes, encoder_weights=None)
+        elif self.backbone == "unet-resnet50-imagenet":
             self.model = sm.Unet('resnet50', classes=num_classes, encoder_weights='imagenet')
         elif self.backbone == "pspnet-resnet50":
+            self.model = sm.PSPNet('resnet50', classes=num_classes, encoder_weights=None)
+        elif self.backbone == "pspnet-resnet50-imagenet":
             self.model = sm.PSPNet('resnet50', classes=num_classes, encoder_weights='imagenet')
         else:
             backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic, loss_type=self.loss_type)
@@ -142,14 +148,14 @@ class SemanticSegmentationModel:
             label_size=self.input_shape,
             batch_size=self.batch_size,
             augmentor=Augmentor(),
-            label_prep=self.label_prep,
+            backbone=self.backbone,
         )
         validation_generator = DataGenerator(
             tag_set_test,
             image_size=self.input_shape,
             label_size=self.input_shape,
             batch_size=self.batch_size,
-            label_prep=self.label_prep
+            backbone=self.backbone
         )
 
         checkpoint = ModelCheckpoint(
