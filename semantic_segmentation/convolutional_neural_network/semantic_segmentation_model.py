@@ -41,6 +41,7 @@ class SemanticSegmentationModel:
         self.model_folder = model_folder
 
         self.color_coding = cfg.color_coding
+        self.opt = cfg.opt
         self.input_shape = cfg.opt["input_shape"]
         self.backbone = cfg.opt["backbone"]
         if "loss" in cfg.opt:
@@ -62,9 +63,9 @@ class SemanticSegmentationModel:
         optimizer = None
         if "optimizer" in cfg.opt:
             if "adam" == cfg.opt["optimizer"]:
-                optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
+                optimizer = optimizers.Adam(learning_rate=cfg.opt["init_learning_rate"])
         if optimizer is None:
-            optimizer = optimizers.Adam(lr=cfg.opt["init_learning_rate"])
+            optimizer = optimizers.Adam(learning_rate=cfg.opt["init_learning_rate"])
         self.optimizer = optimizer
 
         if "batch_size" in cfg.opt:
@@ -93,25 +94,23 @@ class SemanticSegmentationModel:
 
     def build(self, compile_model=True):
         num_classes = len(self.color_coding)
-        input_layer = Input(batch_shape=(None,
-                                         self.input_shape[0],
-                                         self.input_shape[1],
-                                         self.input_shape[2],
-                                         ))
-        if self.backbone == "unet-resnet18":
-            self.model = sm.Unet('resnet18', classes=num_classes, encoder_weights=None)
-        elif self.backbone == "unet-resnet18-imagenet":
-            self.model = sm.Unet('resnet18', classes=num_classes, encoder_weights='imagenet')
-        elif self.backbone == "unet-resnet50":
-            self.model = sm.Unet('resnet50', classes=num_classes, encoder_weights=None)
-        elif self.backbone == "unet-resnet50-imagenet":
-            self.model = sm.Unet('resnet50', classes=num_classes, encoder_weights='imagenet')
-        elif self.backbone == "pspnet-resnet50":
-            self.model = sm.PSPNet('resnet50', classes=num_classes, encoder_weights=None)
-        elif self.backbone == "pspnet-resnet50-imagenet":
-            self.model = sm.PSPNet('resnet50', classes=num_classes, encoder_weights='imagenet')
+
+        architecture, backbone, weights = self.backbone.split("-")
+
+        if weights == "None":
+            weights = None
+
+        if architecture == "unet":
+            self.model = sm.Unet(backbone, classes=num_classes, activation=self.logistic, encoder_weights=weights)
+        elif architecture == "pspnet":
+            self.model = sm.PSPNet(backbone, classes=num_classes, activation=self.logistic, encoder_weights=weights)
+        elif architecture == "linknet":
+            self.model = sm.Linknet(backbone, classes=num_classes, activation=self.logistic, encoder_weights=weights)
+        elif architecture == "fpn":
+            self.model = sm.FPN(backbone, classes=num_classes, activation=self.logistic, encoder_weights=weights)
         else:
             backbone_h = BackboneHandler(self.backbone, num_classes, output_func=self.logistic, loss_type=self.loss_type)
+            input_layer = Input(batch_shape=(None, self.input_shape[0], self.input_shape[1], self.input_shape[2]))
             x = backbone_h.build(input_layer)
             self.model = Model(inputs=input_layer, outputs=x)
         # print(self.model.summary())
@@ -147,7 +146,16 @@ class SemanticSegmentationModel:
             image_size=self.input_shape,
             label_size=self.input_shape,
             batch_size=self.batch_size,
-            augmentor=Augmentor(),
+            augmentor=Augmentor(
+                horizontal_flip=self.opt["aug_horizontal_flip"],
+                vertical_flip=self.opt["aug_vertical_flip"],
+                crop=self.opt["aug_crop"],
+                rotation=self.opt["aug_rotation"],
+                tiny_rotation=self.opt["aug_tiny_rotation"],
+                noise=self.opt["aug_noise"],
+                brightening=self.opt["aug_brightening"],
+                blur=self.opt["aug_blur"]
+            ),
             backbone=self.backbone,
         )
         validation_generator = DataGenerator(
@@ -166,7 +174,7 @@ class SemanticSegmentationModel:
             mode="min",
         )
 
-        patience = 100
+        patience = 32
         reduce_lr = ReduceLROnPlateau(factor=0.5, verbose=1, patience=int(patience*0.5))
         early_stop = EarlyStopping(monitor="val_loss", patience=patience, verbose=1)
 

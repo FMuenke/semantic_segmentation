@@ -44,14 +44,14 @@ class LbmTag:
 
         extensions = [
             ".png", ".jpg", ".jpeg", ".tif", ".tiff", "_label.tiff", "_label.tif", "_label.png",
-            "_segmentation.png", "GT.png", ".npy"
+            "_segmentation.png", "GT.png", ".npy", "_label_ground-truth.png", "_lab.png"
         ]
 
         for ext in extensions:
             pot_label_name = os.path.join(base_dir, base_name + ext)
             if os.path.isfile(pot_label_name):
                 return pot_label_name
-        return None
+        return "None"
 
     def load_x(self):
         img = cv2.imread(self.path_to_image_file)
@@ -61,7 +61,7 @@ class LbmTag:
 
     def load_y_as_color_map(self, label_size):
         y_img = np.zeros((label_size[0], label_size[1], 3))
-        if self.path_to_label_file is None:
+        if self.path_to_label_file == "None":
             return y_img
 
         if self.full_label_map:
@@ -93,7 +93,7 @@ class LbmTag:
 
     def load_y(self, label_size, label_prep=None):
         y_img = np.zeros((label_size[0], label_size[1], len(self.color_coding)))
-        if self.path_to_label_file is None:
+        if self.path_to_label_file == "None":
             return y_img
         if self.full_label_map:
             y_img = np.load(self.path_to_label_file)
@@ -135,7 +135,7 @@ class LbmTag:
     def eval(self, color_map, stats_handler):
         # Classes are compared by comparing the three color values in the image for every pixel
         height, width = color_map.shape[:2]
-        if self.path_to_label_file is not None:
+        if self.path_to_label_file != "None":
             lbm = self.load_y_as_color_map((height, width))
             for idx, cls in enumerate(self.color_coding):
                 cls_key = self.color_coding[cls][1]

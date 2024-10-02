@@ -16,8 +16,8 @@ def main(args_):
 
     cfg = Config()
 
-    model_handler = SemanticSegmentationModel(mf, cfg)
-    model_handler.build()
+    model = SemanticSegmentationModel(mf, cfg)
+    model.build()
 
     save_config(model_dir=mf, cfg=cfg)
 
@@ -28,19 +28,17 @@ def main(args_):
     number_to_train_on = int(args_.number_training_images)
     if number_to_train_on != 0:
         tags = [tag_set[t] for t in tag_set]
-        half = len(tags) // 2
-        train_tags = tags[:half]
-        test_tags = tags[half:]
         seed_id = int(mf.split("-RUN-")[-1])
         rng = np.random.default_rng(seed_id)
-        train_set = rng.choice(train_tags, number_to_train_on, replace=False)
-        # number_to_train_on = np.min([number_to_train_on, len(train_set) - 1])
-        validation_set = rng.choice(test_tags, number_to_train_on, replace=False)
+        tags = rng.choice(tags, number_to_train_on, replace=False)
+        n_val = int(max(1, number_to_train_on * 0.2))
+        train_set = tags[:-n_val]
+        validation_set = tags[-n_val:]
         print("Number of Training images reduced! - {}/{} -".format(len(train_set), len(validation_set)))
-        model_handler.fit(train_set, validation_set)
+        model.fit(train_set, validation_set)
     else:
         train_set, validation_set = d_set.split(tag_set, percentage=0.1, random=cfg.randomized_split)
-        model_handler.fit(train_set, validation_set)
+        model.fit(train_set, validation_set)
     with open(os.path.join(mf, "time.txt"), "w") as f:
         f.write("[INFO] done in %0.3fs" % (time() - t0))
 

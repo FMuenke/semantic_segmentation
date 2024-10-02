@@ -10,9 +10,9 @@ done
 echo "Data Folder: $data_folder";
 echo "Model Folder: $model_folder";
 
-for n in 1 2 4 8 16 32 64 128
+for n in 2 4 8 16 32 64 128 256 512 1024
 do
-  for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+  for i in 0 1 2 3 4 5 6 7 8 9
   do
     current_model_folder="$model_folder-$n-RUN-$i"
     if [ -d $current_model_folder ]

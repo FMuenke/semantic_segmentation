@@ -18,6 +18,6 @@ do
     then
       echo "Directory $current_model_folder"
     else
-      python test_neural_network.py -df $data_folder -model "$folder"
+      python test_neural_network.py -df $data_folder -model "$folder" -p False
     fi
 done

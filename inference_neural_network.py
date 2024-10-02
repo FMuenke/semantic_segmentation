@@ -1,6 +1,6 @@
 import argparse
 import os
-from time import time
+import numpy as np
 
 from tqdm import tqdm
 
@@ -25,8 +25,11 @@ def main(args_):
     t_set = d_set.load()
 
     for tid in tqdm(t_set):
-        color_map = model_handler.predict(t_set[tid].load_x())
-        t_set[tid].write_inference(str(res_fol), color_map)
+        y_proba = model_handler.inference(t_set[tid].load_x())
+        print(y_proba.shape)
+        im_id = os.path.basename(t_set[tid].path_to_image_file)
+        res_file = os.path.join(str(res_fol), im_id[:-4] + ".npy")
+        np.save(res_file, y_proba[0, :, :, :])
 
 
 def parse_args():

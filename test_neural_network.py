@@ -33,7 +33,7 @@ def main(args_):
     for tid in tqdm(t_set):
         color_map = model_handler.predict(t_set[tid].load_x(), conf)
         t_set[tid].eval(color_map, sh)
-        if args_.plot:
+        if args_.plot == "True":
             t_set[tid].write_result(res_fol.path(), color_map)
             t_set[tid].visualize_result(vis_fol.path(), color_map)
 
@@ -57,7 +57,7 @@ def parse_args():
         "--model_folder", "-model", default="./test", help="Path to model directory"
     )
     parser.add_argument("--confidence", "-conf", default=0.5, help="Confidence to accept a classification")
-    parser.add_argument("--plot", "-p", default=False, type=bool, help="Plot the results [TRUE/FALSE]")
+    parser.add_argument("--plot", "-p", default="False", help="Plot the results [TRUE/FALSE]")
     return parser.parse_args()
 
 

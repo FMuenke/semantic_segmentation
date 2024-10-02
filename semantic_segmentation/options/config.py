@@ -8,12 +8,12 @@ class Config:
     def __init__(self):
 
         self.color_coding = {
-            "top": [[255, 255, 255], [255, 255, 255]],
-            # "edge": [1, [10, 217, 252]],
-            # "edge_lowered": [2, [150, 101, 146]],
-            # "curbstone": [3, [22, 124, 99]],
-            # "leaves": [4, [232, 139, 150]],
+            # "crack": [[255, 255, 255], [255, 255, 255]],
+            "crack": [[0, 255, 0], [0, 255, 0]],
+            # "pothole": [[255, 0, 0], [255, 0, 0]],
         }
+
+        # backbones: resnet18, efficientnetb0, mobilenetv2, seresnext50, resnext50
 
         self.opt = {
             "backbone": "unet-resnet18-imagenet",
@@ -21,10 +21,17 @@ class Config:
             "loss": "bc",
             "label_prep": "basic",
             "optimizer": "adam",
-            "input_shape": [256, 256, 3],
+            "input_shape": [256, 256, 3],  # psp: 384
             "batch_size": 8,
-            "use_augmentation": True,
             "init_learning_rate": 10e-4,  # 0.00001 (deeplab)
+            "aug_horizontal_flip": True,
+            "aug_vertical_flip": True,
+            "aug_crop": True,
+            "aug_rotation": True,
+            "aug_tiny_rotation": False,
+            "aug_noise": False,
+            "aug_brightening": False,
+            "aug_blur": False,
             "tf-version": tf.__version__,
         }
 
